@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
     return StreamProvider.value(
       value: AuthService().user,
       child: MaterialApp(
-        themeMode: ThemeMode.light,
+        themeMode: ThemeMode.dark,
         darkTheme: darkMode(),
         theme: GSConstants.defaultTheme,
         home: Wrapper(),
@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   ThemeData darkMode() {
-    Color favColor = Colors.blue;
+    Color favColor = Colors.green;
     return ThemeData(
       primaryColor: favColor,
       accentColor: favColor,
