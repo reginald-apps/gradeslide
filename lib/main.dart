@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   ThemeData darkMode() {
-    Color favColor = Colors.green;
+    Color favColor = Colors.yellow;
     return ThemeData(
       primaryColor: favColor,
       accentColor: favColor,
