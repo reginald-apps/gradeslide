@@ -57,7 +57,7 @@ class _GSCardWorkState extends State<GSCardWork> {
                                       Container(
                                         width: 30,
                                         child: Text(
-                                          "#${widget.id + 1}!",
+                                          "#${widget.id + 1}",
                                           style: TextStyle(color: Colors.white),
                                           textScaleFactor: 1,
                                           textAlign: TextAlign.left,
