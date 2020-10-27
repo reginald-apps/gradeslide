@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
+import 'package:gradeslide/logic/gsmaths.dart';
+import 'package:gradeslide/pages/courses/categories/work/works_gscard_gstrack.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_page.dart';
 
 class ShowWorks extends StatefulWidget {
@@ -85,128 +87,217 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
           _toggleExpand();
         });
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.all(Radius.circular(15)),
-        child: Container(
-          color: Colors.grey.withOpacity(.15),
-          child: Column(
-            children: [
-              InkWell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Text(
-                    widget.category.isShowMore ? "Show ${widget.works.length} ${widget.category.name}" : "Show Less",
-                    textScaleFactor: .85,
-                    style: TextStyle(color: Colors.grey.withOpacity(.50)),
-                    textAlign: TextAlign.center,
+      child: LayoutBuilder(builder: (context, constraints) {
+        return ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(15)),
+          child: Container(
+            color: Colors.grey.withOpacity(.15),
+            child: Column(
+              children: [
+                InkWell(
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Text(
+                      widget.category.isShowMore ? "Show ${widget.works.length} ${widget.category.name}" : "Show Less",
+                      textScaleFactor: .85,
+                      style: TextStyle(color: Colors.grey.withOpacity(.50)),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
-              ),
-              SizeTransition(
-                sizeFactor: _sizeAnimation,
-                child: Column(
-                  children: widget.works
-                      .asMap()
-                      .entries
-                      .map((e) => InkWell(
-                            onTap: () {
-                              Navigator.of(context)
-                                  .push(MaterialPageRoute(builder: (context) => WorksPage(widget.course, widget.category, widget.categoriesInCourse, e.key)));
-                            },
-                            child: Container(
-                              height: 40,
-                              color: e.value.completed ? Colors.green[400] : Colors.amber[700],
+                SizeTransition(
+                  sizeFactor: _sizeAnimation,
+                  child: Column(
+                    children: [
+                      Divider(
+                        height: 5,
+                        endIndent: 10,
+                        indent: 10,
+                      ),
+                      Container(
+                        height: 30,
+                        child: Row(
+                          children: [
+                            Expanded(
+                                flex: 3,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 10.0),
+                                  child: Text(
+                                    "Complete",
+                                    style: TextStyle(color: Colors.grey.withOpacity(.50)),
+                                    textAlign: TextAlign.left,
+                                    textScaleFactor: .75,
+                                  ),
+                                )),
+                            Expanded(
+                                flex: 8,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 10.0),
+                                  child: Text(
+                                    "Title",
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(color: Colors.grey.withOpacity(.50)),
+                                    textAlign: TextAlign.left,
+                                    textScaleFactor: .75,
+                                  ),
+                                )),
+                            Expanded(
+                                flex: 3,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 10.0),
+                                  child: Text(
+                                    "Points",
+                                    textAlign: TextAlign.center,
+                                    textScaleFactor: .75,
+                                    style: TextStyle(color: Colors.grey.withOpacity(.50)),
+                                  ),
+                                )),
+                            Expanded(
+                              flex: 2,
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                        flex: 3,
-                                        child: Stack(
-                                          children: [
-                                            Icon(
-                                              e.value.completed ? Icons.check : null,
-                                              color: Colors.white.withOpacity(.75),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(left: 35, top: 2),
-                                              child: Text(
-                                                "#${e.key + 1}",
-                                                style: TextStyle(color: Colors.white),
-                                                textAlign: TextAlign.left,
-                                              ),
-                                            ),
-                                          ],
-                                        )),
-                                    Expanded(
-                                        flex: 8,
-                                        child: Text(
-                                          "${e.value.name}",
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(color: Colors.white),
-                                          textAlign: TextAlign.left,
-                                        )),
-                                    Expanded(
-                                        flex: 3,
-                                        child: Row(
-                                          children: [
-                                            Column(
-                                              children: [
-                                                Text(
-                                                  "${e.value.pointsEarned}/",
-                                                  style: TextStyle(color: Colors.white),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                                Text(
-                                                  "Points",
-                                                  textScaleFactor: .5,
-                                                  textAlign: TextAlign.center,
-                                                )
-                                              ],
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                            ),
-                                            Column(
-                                              children: [
-                                                Text(
-                                                  "${e.value.pointsMax}",
-                                                  style: TextStyle(color: Colors.white),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ],
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                            ),
-                                          ],
-                                        )),
-                                    Expanded(
-                                        flex: 2,
-                                        child: Text(
-                                          "${((e.value.pointsEarned / e.value.pointsMax) * 100).truncate()}%",
-                                          style: TextStyle(color: Colors.white),
-                                          textAlign: TextAlign.center,
-                                        )),
-                                    Expanded(
-                                        flex: 1,
-                                        child: Align(
-                                          alignment: Alignment.centerRight,
-                                          child: Container(
-                                            height: 30,
-                                            child: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white),
-                                          ),
-                                        ))
-                                  ],
-                                ),
+                                padding: const EdgeInsets.only(right: 10.0),
+                                child: Text("Score",
+                                    textScaleFactor: .75,
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      color: Colors.grey.withOpacity(.50),
+                                    )),
                               ),
                             ),
-                          ))
-                      .toList(),
-                ),
-              )
-            ],
+                            Expanded(
+                                flex: 1,
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Container(),
+                                ))
+                          ],
+                        ),
+                      ),
+                      Column(
+                        children: widget.works
+                            .asMap()
+                            .entries
+                            .map((e) => InkWell(
+                                  onTap: () {
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(builder: (context) => WorksPage(widget.course, widget.category, widget.categoriesInCourse, e.key)));
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        height: 30,
+                                        color: e.value.completed ? Colors.green[400] : Colors.amber[700],
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                  flex: 3,
+                                                  child: Stack(
+                                                    children: [
+                                                      Icon(
+                                                        e.value.completed ? Icons.check : null,
+                                                        color: Colors.white.withOpacity(.75),
+                                                      ),
+                                                      Padding(
+                                                        padding: EdgeInsets.only(left: 35, top: 2),
+                                                        child: Text(
+                                                          "#${e.key + 1}",
+                                                          style: TextStyle(color: Colors.white),
+                                                          textAlign: TextAlign.left,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )),
+                                              Expanded(
+                                                  flex: 8,
+                                                  child: Text(
+                                                    "${e.value.name}",
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: TextStyle(color: Colors.white),
+                                                    textAlign: TextAlign.left,
+                                                  )),
+                                              Expanded(
+                                                  flex: 3,
+                                                  child: Row(
+                                                    children: [
+                                                      Column(
+                                                        children: [
+                                                          Text(
+                                                            "${e.value.pointsEarned}/",
+                                                            style: TextStyle(color: Colors.white),
+                                                            textAlign: TextAlign.center,
+                                                          ),
+                                                          Text("Points",
+                                                              textScaleFactor: .5,
+                                                              textAlign: TextAlign.center,
+                                                              style: TextStyle(
+                                                                color: Colors.white.withOpacity(.75),
+                                                              ))
+                                                        ],
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          Text(
+                                                            "${e.value.pointsMax}",
+                                                            style: TextStyle(color: Colors.white),
+                                                            textAlign: TextAlign.center,
+                                                          ),
+                                                        ],
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                      ),
+                                                    ],
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                  )),
+                                              Expanded(
+                                                  flex: 2,
+                                                  child: Text(
+                                                    "${((e.value.pointsEarned / e.value.pointsMax) * 100).truncate()}%",
+                                                    style: TextStyle(color: Colors.white),
+                                                    textAlign: TextAlign.end,
+                                                  )),
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: Align(
+                                                    alignment: Alignment.centerRight,
+                                                    child: Container(
+                                                      height: 30,
+                                                      child: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white),
+                                                    ),
+                                                  ))
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Stack(
+                                        children: [
+                                          Container(
+                                            height: 31,
+                                            color: e.value.completed ? Colors.green[200] : Colors.orange[200],
+                                          ),
+                                          Center(
+                                            child: Container(
+                                                width: constraints.maxWidth * widget.category.weight * 1.0 * GradeSlideMaths.getWorth(widget.works, e.value),
+                                                child: GSTrackWork(e.value, false, true)),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

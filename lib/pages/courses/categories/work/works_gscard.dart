@@ -130,7 +130,7 @@ class _GSCardWorkState extends State<GSCardWork> {
                     ],
                   ),
                 ),
-                GSTrackWork(widget.work, widget.isEditingMode),
+                GSTrackWork(widget.work, widget.isEditingMode, false),
               ],
             ),
           ),

@@ -12,7 +12,7 @@ class DatabaseService {
   //===========================================COURSE============================================//
 
   Stream<List<Course>> streamCourses(String userId) async* {
-    //await Future.delayed(Duration(milliseconds: 700));
+    await Future.delayed(Duration(milliseconds: 700));
     var ref = _coursesCollection.where("userId", isEqualTo: userId);
     yield* ref.snapshots().map((list) => list.documents.map((courseDocument) {
           return Course.fromJson(courseDocument.documentID, courseDocument.data);

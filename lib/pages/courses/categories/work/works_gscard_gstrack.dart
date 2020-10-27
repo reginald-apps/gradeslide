@@ -5,8 +5,9 @@ import 'package:gradeslide/logic/course_data.dart';
 class GSTrackWork extends StatefulWidget {
   final Work work;
   final bool isEditingMode;
+  final bool isSmaller;
 
-  const GSTrackWork(this.work, this.isEditingMode);
+  const GSTrackWork(this.work, this.isEditingMode, this.isSmaller);
 
   @override
   _GSTrackWorkState createState() => _GSTrackWorkState();
@@ -35,15 +36,16 @@ class _GSTrackWorkState extends State<GSTrackWork> with SingleTickerProviderStat
     var isDark = Theme.of(context).brightness == Brightness.dark;
     var work = widget.work;
     return Padding(
-      padding: const EdgeInsets.only(left: 25.0, top: 10, bottom: 10, right: 25.0),
+      padding: EdgeInsets.only(left: widget.isSmaller ? 0 : 25.0, top: 10, bottom: 10, right: widget.isSmaller ? 0 : 25.0),
       child: LayoutBuilder(builder: (context, constraints) {
         double width = constraints.maxWidth;
         return AnimatedBuilder(
           animation: _animation,
           builder: (BuildContext context, Widget child) {
             return Container(
-              decoration:
-                  BoxDecoration(border: Border.all(width: 3, color: work.completed ? Colors.green : Colors.orange), borderRadius: BorderRadius.all(Radius.circular(15))),
+              decoration: BoxDecoration(
+                  border: Border.all(width: widget.isSmaller ? 1 : 3, color: work.completed ? Colors.green : Colors.orange),
+                  borderRadius: BorderRadius.all(Radius.circular(15))),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: Stack(
@@ -56,7 +58,7 @@ class _GSTrackWorkState extends State<GSTrackWork> with SingleTickerProviderStat
                         fit: BoxFit.cover,
                         animation: "Progress",
                       ),
-                      height: 10,
+                      height: widget.isSmaller ? 7.5 : 10,
                       width: width,
                     ),
                     Align(
@@ -65,7 +67,7 @@ class _GSTrackWorkState extends State<GSTrackWork> with SingleTickerProviderStat
                         duration: Duration(milliseconds: 250),
                         curve: Curves.ease,
                         color: work.completed ? Colors.red : Colors.orange.withOpacity(.30),
-                        height: 10,
+                        height: widget.isSmaller ? 7.5 : 10,
                         width: width,
                       ),
                     ),
@@ -81,8 +83,8 @@ class _GSTrackWorkState extends State<GSTrackWork> with SingleTickerProviderStat
                             : isDark
                                 ? Colors.orange[600]
                                 : Colors.orange,
-                        height: 10,
-                        width: width * ((work.pointsEarned / work.pointsMax)) * _animation.value,
+                        height: widget.isSmaller ? 7.5 : 10,
+                        width: width * ((work.pointsEarned / work.pointsMax)),
                       ),
                     ),
                   ],

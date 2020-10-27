@@ -152,7 +152,6 @@ class _GSTrackCourseState extends State<GSTrackCourse> with SingleTickerProvider
                                                     rowMax += GradeSlideMaths.getCategoryMaximumTargetGrade(works) * category.weight;
                                                     rowGrade += GradeSlideMaths.getCategoryCompletedGrade(works, true) * category.weight;
                                                     rowTarget += GradeSlideMaths.getCategoryTargetGrade(works) * category.weight;
-                                                    print(rowTarget);
                                                   }
                                                   if (workListSnapshot.connectionState == ConnectionState.waiting &&
                                                       categoriesSnapshot.connectionState == ConnectionState.waiting) {

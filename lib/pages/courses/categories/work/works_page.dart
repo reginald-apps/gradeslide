@@ -42,14 +42,14 @@ class _WorksPageState extends State<WorksPage> {
 
   changeSelector() {
     var scrollValue = _trackingScrollController.offset;
-    print(scrollValue);
+    //print(scrollValue);
   }
 
   @override
   Widget build(BuildContext context) {
     var db = DatabaseService();
     List<Work> worksInCourse = [];
-
+    var isDark = Theme.of(context).brightness == Brightness.dark;
     return StreamBuilder(
         stream: db.streamWorks(widget.category.documentId),
         builder: (context, snapshot) {
@@ -141,14 +141,9 @@ class _WorksPageState extends State<WorksPage> {
                         onReorder: (m, n) {})
                     : Column(
                         children: <Widget>[
-                          Divider(
-                            color: Colors.white.withOpacity(.75),
-                            height: 0,
-                            thickness: 1,
-                          ),
                           Container(
-                            color: Colors.green[400],
                             //color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800] : Colors.white,
+                            color: isDark ? Colors.white10 : Colors.white,
                             height: 40,
                             child: Padding(
                               padding: const EdgeInsets.only(left: 20.0, right: 25.0, top: 5.0, bottom: 5.0),
@@ -158,19 +153,19 @@ class _WorksPageState extends State<WorksPage> {
                                       child: Text(
                                     "Complete",
                                     textAlign: TextAlign.left,
-                                    style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white.withOpacity(.5)),
+                                    style: TextStyle(fontWeight: FontWeight.w900, color: Colors.grey.withOpacity(.5)),
                                   )),
                                   Expanded(
                                       child: Text(
                                     "Title",
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white.withOpacity(.5)),
+                                    style: TextStyle(fontWeight: FontWeight.w900, color: Colors.grey.withOpacity(.5)),
                                   )),
                                   Expanded(
                                       child: Text(
                                     "Score",
                                     textAlign: TextAlign.right,
-                                    style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white.withOpacity(.5)),
+                                    style: TextStyle(fontWeight: FontWeight.w900, color: Colors.grey.withOpacity(.5)),
                                   )),
                                 ],
                               ),
@@ -178,8 +173,8 @@ class _WorksPageState extends State<WorksPage> {
                           ),
                           Divider(
                             height: 0,
-                            color: Colors.white.withOpacity(.5),
-                            thickness: 1,
+                            color: Colors.white.withOpacity(.65),
+                            thickness: .5,
                           ),
                           Expanded(
                             child: Column(

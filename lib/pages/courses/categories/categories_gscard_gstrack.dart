@@ -19,8 +19,8 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
 
   @override
   void initState() {
-    _controller = AnimationController(duration: Duration(milliseconds: 400), vsync: this);
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    _controller = AnimationController(duration: Duration(milliseconds: 1000), vsync: this);
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.elasticOut);
     _controller.forward();
     super.initState();
   }
@@ -44,7 +44,7 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
               builder: (context, snapshot) {
                 return snapshot.hasData
                     ? LayoutBuilder(builder: (context, constraints) {
-                        double trackLength = constraints.maxWidth;
+                        double trackLength = constraints.maxWidth * _animation.value;
                         double completedStart = 0;
                         double completedWidth = category.weight * trackLength * GradeSlideMaths.getCategoryCompletedGrade(snapshot.data, false);
 
@@ -57,78 +57,74 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
                         double progressEnd = category.weight * trackLength;
 
                         double animationProgress = _animation.value;
-                        return Column(
-                          children: <Widget>[
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(15.0),
-                              child: Stack(
-                                children: <Widget>[
-                                  Container(
-                                    width: trackLength * category.weight,
-                                    foregroundDecoration: Theme.of(context).brightness == Brightness.dark
-                                        ? BoxDecoration(
-                                            border: Border.all(width: 2.5, color: Colors.black.withOpacity(.25)), borderRadius: BorderRadius.all(Radius.circular(15)))
-                                        : BoxDecoration(
-                                            color: Colors.transparent,
-                                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                                            backgroundBlendMode: BlendMode.lighten,
-                                            border: Border.all(width: 3, color: Colors.white.withOpacity(.2))),
-                                    child: Stack(
-                                      children: <Widget>[
-                                        Positioned(
-                                          child: AnimatedContainer(
-                                            duration: Duration(milliseconds: 500),
-                                            curve: Curves.bounceOut,
-                                            color: Colors.black.withOpacity(.10),
-                                            height: height,
-                                            width: trackLength,
-                                            child: Container(),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          left: completedStart,
-                                          child: ClipPath(
-                                            clipper: ProgressClipper(width: (category.weight) * trackLength),
-                                            child: FlareActor(
-                                              "flares/progbar.flr",
-                                              fit: BoxFit.cover,
-                                              animation: "Progress",
-                                            ),
-                                          ),
-                                          height: height,
-                                          width: trackLength,
-                                        ),
-                                        Positioned(
-                                          left: completedStart,
-                                          child: AnimatedContainer(
-                                            color: Colors.green,
-                                            duration: Duration(milliseconds: 250),
-                                            curve: Curves.ease,
-                                            height: height,
-                                            width: completedWidth * animationProgress,
-                                          ),
-                                        ),
-                                        Positioned(
-                                          right: (trackLength * category.weight) - progressStart - progressEnd,
-                                          child: AnimatedContainer(
-                                            duration: Duration(milliseconds: 250),
-                                            curve: Curves.ease,
-                                            color: Colors.red,
-                                            height: height,
-                                            width: (maximumWidth * animationProgress),
-                                          ),
-                                        ),
-                                      ],
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(15.0),
+                          child: Stack(
+                            children: <Widget>[
+                              Container(
+                                width: trackLength * category.weight,
+                                foregroundDecoration: Theme.of(context).brightness == Brightness.dark
+                                    ? BoxDecoration(
+                                        border: Border.all(width: 2.5, color: Colors.black.withOpacity(.25)), borderRadius: BorderRadius.all(Radius.circular(15)))
+                                    : BoxDecoration(
+                                        color: Colors.transparent,
+                                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                                        backgroundBlendMode: BlendMode.lighten,
+                                        border: Border.all(width: 3, color: Colors.white.withOpacity(.2))),
+                                child: Stack(
+                                  children: <Widget>[
+                                    Positioned(
+                                      child: AnimatedContainer(
+                                        duration: Duration(milliseconds: 500),
+                                        curve: Curves.bounceOut,
+                                        color: Colors.black.withOpacity(.10),
+                                        height: height,
+                                        width: trackLength,
+                                        child: Container(),
+                                      ),
                                     ),
-                                  ), /*
-                                  Positioned(
-                                    left: targetStart - 4 + targetWidth * animationProgress,
-                                    child: AnimatedContainer(duration: Duration(seconds: 1), child: GSTrackCategoryMarker(0.0, height + 2)),
-                                  ),*/
-                                ],
-                              ),
-                            ),
-                          ],
+                                    Positioned(
+                                      left: completedStart,
+                                      child: ClipPath(
+                                        clipper: ProgressClipper(width: (category.weight) * trackLength),
+                                        child: FlareActor(
+                                          "flares/progbar.flr",
+                                          fit: BoxFit.cover,
+                                          animation: "Progress",
+                                        ),
+                                      ),
+                                      height: height,
+                                      width: trackLength,
+                                    ),
+                                    Positioned(
+                                      left: completedStart,
+                                      child: AnimatedContainer(
+                                        color: Colors.green,
+                                        duration: Duration(milliseconds: 250),
+                                        curve: Curves.ease,
+                                        height: height,
+                                        width: completedWidth * animationProgress,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      right: (trackLength * category.weight) - progressStart - progressEnd,
+                                      child: AnimatedContainer(
+                                        duration: Duration(milliseconds: 250),
+                                        curve: Curves.ease,
+                                        color: Colors.red,
+                                        height: height,
+                                        width: (maximumWidth * animationProgress),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ), /*
+                              Positioned(
+                                left: targetStart - 4 + targetWidth * animationProgress,
+                                child: AnimatedContainer(duration: Duration(seconds: 1), child: GSTrackCategoryMarker(0.0, height + 2)),
+                              ),*/
+                            ],
+                          ),
                         );
                       })
                     : Padding(
