@@ -55,6 +55,7 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
 
                         double progressStart = 0;
                         double progressEnd = category.weight * trackLength;
+
                         double animationProgress = _animation.value;
                         return ClipRRect(
                           borderRadius: BorderRadius.circular(15.0),
