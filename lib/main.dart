@@ -15,6 +15,7 @@ class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
+
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
@@ -26,7 +27,7 @@ class _MyAppState extends State<MyApp> {
     return StreamProvider.value(
       value: AuthService().user,
       child: MaterialApp(
-        themeMode: ThemeMode.dark,
+        themeMode: ThemeMode.light,
         darkTheme: darkMode(),
         theme: GSConstants.defaultTheme,
         home: Wrapper(),
