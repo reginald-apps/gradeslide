@@ -1,27 +1,23 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gradeslide/logic/course_data.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gradeslide/login/user.dart';
+
+import 'gsmaths.dart';
 
 class DatabaseService {
   final _coursesCollection = Firestore.instance.collection('courses');
   final _categoriesCollection = Firestore.instance.collection('categories');
   final _worksCollection = Firestore.instance.collection('works');
-  final bool isProUser = true;
-
   //===========================================COURSE============================================//
 
   Stream<List<Course>> streamCourses(String userId) async* {
-    await Future.delayed(Duration(milliseconds: 700));
     var ref = _coursesCollection.where("userId", isEqualTo: userId);
     yield* ref.snapshots().map((list) => list.documents.map((courseDocument) {
           return Course.fromJson(courseDocument.documentID, courseDocument.data);
         }).toList());
-  }
-
-  Future<DocumentSnapshot> getCourse(String courseKey) {
-    DocumentReference doc = _coursesCollection.document(courseKey);
-    return doc.get();
   }
 
   Future<String> addCourse(User user) async {
@@ -30,6 +26,35 @@ class DatabaseService {
       'sorts': [false, true, true]
     });
     return doc.documentID;
+  }
+
+  Future<String> addSampleCourse(FirebaseUser user) async {
+    DocumentReference courseDocument = await _coursesCollection.add({
+      'title': "Chemistry",
+      'userId': user.uid,
+    });
+    String courseKey = courseDocument.documentID;
+    await Future.delayed(Duration(milliseconds: 200));
+    String examsKey = await addCategory(courseKey, categoryName: "Exams", weight: 0.5);
+    addWork(examsKey, "Exam 1", 45, 50);
+    addWork(examsKey, "Exam 2", 40, 60);
+    await Future.delayed(Duration(milliseconds: 400));
+    String quizzesKey = await addCategory(courseKey, categoryName: "Quizzes", weight: 0.2);
+    addWork(quizzesKey, "Quiz 1", 10, 10);
+    addWork(quizzesKey, "Quiz 2", 5, 10);
+    addWork(quizzesKey, "Quiz 3", 9, 10);
+    addWork(quizzesKey, "Quiz 4", 10, 10);
+    await Future.delayed(Duration(milliseconds: 600));
+    String homeworkKey = await addCategory(courseKey, categoryName: "Homework", weight: 0.05);
+    addWork(homeworkKey, "Homework 1", 4, 5);
+    addWork(homeworkKey, "Homework 2", 0, 5);
+    addWork(homeworkKey, "Homework 3", 1, 2);
+    addWork(homeworkKey, "Homework 4", 7, 10);
+    addWork(homeworkKey, "Homework 5", 10, 10);
+    addWork(homeworkKey, "Homework 6", 8, 10);
+    String finalKey = await addCategory(courseKey, categoryName: "Final Exam", weight: 0.25);
+    addWork(finalKey, "Final Exam", 55, 60);
+    return courseDocument.documentID;
   }
 
   Future<bool> updateCourseSorts(String courseKey, bool isIndicies, bool isAZ, bool isWeights) async {
@@ -46,13 +71,22 @@ class DatabaseService {
     return sorts;
   }
 
-  Future<void> deleteCourse(String courseKey) async {
-    var ref = _worksCollection.where("courseKey", isEqualTo: courseKey);
-    ref.snapshots().map((list) => list.documents.map((categoryDocument) async {
-          print('Deleting..');
-          await deleteCategory(categoryDocument.documentID);
-          return Category.fromJson(categoryDocument.documentID, categoryDocument.data);
-        }).toList());
+  Future<bool> updateCourseIsShowMore(String courseKey, bool showMore) async {
+    await _coursesCollection.document(courseKey).updateData({"isShowMore": showMore});
+    return true;
+  }
+
+  Future<bool> deleteCourse(String courseKey) async {
+    streamCategories(courseKey).forEach((categoriesToDelete) {
+      for (Category category in categoriesToDelete) {
+        deleteCategory(category.documentId);
+        streamWorks(category.documentId).forEach((worksToDelete) {
+          for (Work work in worksToDelete) {
+            deleteWork(work.documentId);
+          }
+        });
+      }
+    });
     _coursesCollection.document(courseKey).delete();
   }
   //==========================================CATEGORIES===========================================//
@@ -64,8 +98,9 @@ class DatabaseService {
         }).toList());
   }
 
-  Future<void> addCategory(String courseKey) async {
-    await _categoriesCollection.add({'courseKey': courseKey, 'weight': 0.1});
+  Future<String> addCategory(String courseKey, {String categoryName, double weight}) async {
+    DocumentReference doc = await _categoriesCollection.add({'courseKey': courseKey, 'weight': weight, 'name': categoryName, 'isShowMore': true});
+    return doc.documentID;
   }
 
   Future<bool> updateCategorySorts(String categoryKey, bool isIndicies, bool isAZ, bool isWeights) async {
@@ -80,7 +115,7 @@ class DatabaseService {
     return true;
   }
 
-  Future<bool> updateisShowMore(String categoryKey, bool showMore) async {
+  Future<bool> updateCategoryIsShowMore(String categoryKey, bool showMore) async {
     await _categoriesCollection.document(categoryKey).updateData({"isShowMore": showMore});
     return true;
   }
@@ -93,6 +128,11 @@ class DatabaseService {
   }
 
   Future<void> deleteCategory(String categoryKey) async {
+    streamWorks(categoryKey).forEach((worksToDelete) {
+      for (Work work in worksToDelete) {
+        deleteWork(work.documentId);
+      }
+    });
     await _categoriesCollection.document(categoryKey).delete();
   }
 
@@ -109,8 +149,8 @@ class DatabaseService {
     return numWorks.documents.length;
   }
 
-  Future<void> addWork(String categoryKey, String categoryName) async {
-    await _worksCollection.add({'categoryKey': categoryKey, "pointsEarned": 10, 'name': categoryName});
+  Future<void> addWork(String categoryKey, String name, int pointsEarned, int pointsMax) async {
+    await _worksCollection.add({'categoryKey': categoryKey, "pointsEarned": pointsEarned, "pointsMax": pointsMax, 'name': name});
   }
 
   Future<bool> deleteWork(String workKey) async {
@@ -135,13 +175,6 @@ class DatabaseService {
 
   Future<bool> updateWorkMax(String workKey, int newPoints) async {
     await _worksCollection.document(workKey).updateData({"pointsMax": newPoints});
-    return true;
-  }
-
-  Future<bool> deleteWorks(List<Work> works) async {
-    for (Work work in works) {
-      await deleteWork(work.documentId);
-    }
     return true;
   }
 

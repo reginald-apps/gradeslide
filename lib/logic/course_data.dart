@@ -21,14 +21,27 @@ class Course {
   String documentId;
   String prefix;
   int id;
+  int index;
   int totalPoints;
   String title;
+  bool isShowMore;
   int credits;
   List<bool> sorts;
   List<Category> categoryList; //TODO
   List<double> scale; //TODO
 
-  Course({this.documentId = "", this.prefix = "", this.id, this.title = "", this.credits = 3, this.totalPoints = 1000, this.sorts, this.categoryList, this.scale});
+  Course(
+      {this.documentId = "",
+      this.prefix = "",
+      this.id,
+      this.index,
+      this.title = "",
+      this.credits = 3,
+      this.totalPoints = 1000,
+      this.sorts,
+      this.categoryList,
+      this.scale,
+      this.isShowMore});
 
   factory Course.fromJson(String documentId, Map<String, dynamic> json) => _$CourseFromJson(documentId, json);
 
@@ -42,11 +55,11 @@ class Category {
   int index;
   String name;
   double weight;
-  bool isShowMore;
+  bool isShowingMore;
   List<bool> sorts;
   List<Work> grades; //TODO
 
-  Category({this.documentId, this.index, this.name, this.weight, this.points, this.sorts, this.grades, this.isShowMore});
+  Category({this.documentId, this.index, this.name, this.weight, this.points, this.sorts, this.grades, this.isShowingMore});
 
   factory Category.fromJson(String documentId, Map<String, dynamic> json) => _$CategoryFromJson(documentId, json);
 
@@ -55,7 +68,7 @@ class Category {
   @override
   String toString() {
     // TODO: implement toString
-    return "$name (id: $index)";
+    return "$name";
   }
 }
 
@@ -74,4 +87,9 @@ class Work {
   factory Work.fromJson(String documentId, Map<String, dynamic> json) => _$WorkFromJson(documentId, json);
 
   Map<String, dynamic> toJson() => _$WorkToJson(this);
+
+  @override
+  String toString() {
+    return name;
+  }
 }

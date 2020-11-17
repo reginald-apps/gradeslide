@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
+import 'package:provider/provider.dart';
 
 class CourseEditPage extends StatefulWidget {
   final Course course;
@@ -14,7 +15,7 @@ class CourseEditPage extends StatefulWidget {
 class _CourseEditPageState extends State<CourseEditPage> {
   @override
   Widget build(BuildContext context) {
-    var db = DatabaseService();
+    DatabaseService db = Provider.of<DatabaseService>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("${widget.course.title}"),

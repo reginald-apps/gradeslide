@@ -151,9 +151,12 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
-          style: TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Montserrat-Black"),
           onChanged: (input) => _username = input,
-          decoration: InputDecoration(prefixIcon: Icon(Icons.email), labelText: 'Email', border: UnderlineInputBorder(), hoverColor: Colors.white),
+          decoration: InputDecoration(
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(.35))),
+              labelText: 'Email',
+              labelStyle: TextStyle(color: Colors.white.withOpacity(.55))),
           cursorWidth: 1,
           autovalidateMode: AutovalidateMode.always,
         ),
@@ -166,13 +169,12 @@ class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProvid
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
-          style: TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Montserrat-Black"),
           onChanged: (input) => _password = input,
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.lock),
-            labelText: 'Password',
-            border: UnderlineInputBorder(),
-          ),
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(.35))),
+              labelText: 'Password',
+              labelStyle: TextStyle(color: Colors.white.withOpacity(.55))),
           obscureText: true,
           autovalidateMode: AutovalidateMode.always,
           cursorWidth: 1,

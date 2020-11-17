@@ -33,94 +33,97 @@ class _LoadingScreenState extends State<LoadingScreen> with SingleTickerProvider
           child: AnimatedBuilder(
               animation: _controller,
               builder: (context, widget) {
-                return Stack(
-                  children: <Widget>[
-                    Align(
-                      alignment: Alignment.center,
-                      child: Transform(
-                          transform: Matrix4.identity()
-                            ..setEntry(3, 2, 0.015)
-                            ..leftTranslate(0.0, -25.0, 10.0)
-                            ..rotateZ(math.pi)
-                            ..rotateX(4.25 + (_animation.value * -10.0))
-                            ..translate(0.0, 0, 800),
-                          alignment: Alignment.center,
-                          child: Transform.scale(scale: 4.0, child: RotatedBox(quarterTurns: 2, child: Image(image: ExactAssetImage('images/pencil.png'))))),
-                    ),
-                    /*Align(
-                       alignment: Alignment.center,
-                       child: CustomPaint(
-                         painter: GradeSlideBorderPainter(
-                             completion: _animation.value),
-                       ),
-                     ),*/
-                    Align(
-                      alignment: Alignment.center,
-                      child: Opacity(
-                          opacity: (_animation.value - .1) * 1.4367953,
-                          child: Transform(
-                            transform: Matrix4.identity()..translate(0.0, -(_animation.value * 30), 0.0),
-                            child: Text(
-                              "GR  DE\nSL  DE",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: "Fredoka",
-                                  fontSize: 20.0,
-                                  letterSpacing: 9 - (_animation.value * 9),
-                                  fontWeight: FontWeight.lerp(FontWeight.w100, FontWeight.w800, _animation.value)),
-                            ),
-                          )),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Opacity(
-                          opacity: (_animation.value) * .2,
-                          child: Transform(
-                            transform: Matrix4.identity()..translate(0.0, -(_animation.value * 30), 0.0),
-                            child: Text(
-                              "A\nI",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.white.withOpacity((_animation.value / 0.8)),
-                                  fontFamily: "Fredoka",
-                                  fontSize: 20.0,
-                                  letterSpacing: 9 - (_animation.value * 9),
-                                  fontWeight: FontWeight.lerp(FontWeight.normal, FontWeight.w900, 0.0)),
-                            ),
-                          )),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Opacity(
-                          opacity: (_animation.value - .1) * 1.4367953,
-                          child: Transform(
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 50.0),
+                  child: Stack(
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.center,
+                        child: Transform(
                             transform: Matrix4.identity()
                               ..setEntry(3, 2, 0.015)
-                              ..translate(0.0, _animation.value * 100, 0.0),
-                            child: Text(
-                              _loadingText,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: "Fredoka",
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.lerp(FontWeight.w400, FontWeight.w100, (0.5 - _animation.value))),
+                              ..leftTranslate(0.0, -25.0, 10.0)
+                              ..rotateZ(math.pi)
+                              ..rotateX(4.25 + (_animation.value * -10.0))
+                              ..translate(0.0, 0, 800),
+                            alignment: Alignment.center,
+                            child: Transform.scale(scale: 4.0, child: RotatedBox(quarterTurns: 2, child: Image(image: ExactAssetImage('images/pencil.png'))))),
+                      ),
+                      /*Align(
+                         alignment: Alignment.center,
+                         child: CustomPaint(
+                           painter: GradeSlideBorderPainter(
+                               completion: _animation.value),
+                         ),
+                       ),*/
+                      Align(
+                        alignment: Alignment.center,
+                        child: Opacity(
+                            opacity: (_animation.value - .1) * 1.4367953,
+                            child: Transform(
+                              transform: Matrix4.identity()..translate(0.0, -(_animation.value * 30), 0.0),
+                              child: Text(
+                                "GR  DE\nSL  DE",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Fredoka",
+                                    fontSize: 20.0,
+                                    letterSpacing: 9 - (_animation.value * 9),
+                                    fontWeight: FontWeight.lerp(FontWeight.w100, FontWeight.w800, _animation.value)),
+                              ),
+                            )),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Opacity(
+                            opacity: (_animation.value) * .2,
+                            child: Transform(
+                              transform: Matrix4.identity()..translate(0.0, -(_animation.value * 30), 0.0),
+                              child: Text(
+                                "A\nI",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.white.withOpacity((_animation.value / 0.8)),
+                                    fontFamily: "Fredoka",
+                                    fontSize: 20.0,
+                                    letterSpacing: 9 - (_animation.value * 9),
+                                    fontWeight: FontWeight.lerp(FontWeight.normal, FontWeight.w900, 0.0)),
+                              ),
+                            )),
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Opacity(
+                            opacity: (_animation.value - .1) * 1.4367953,
+                            child: Transform(
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.015)
+                                ..translate(0.0, _animation.value * 100, 0.0),
+                              child: Text(
+                                _loadingText,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Fredoka",
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.lerp(FontWeight.w400, FontWeight.w100, (0.5 - _animation.value))),
+                              ),
+                            )),
+                      ),
+                      Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(style: TextStyle(color: Colors.white), children: [
+                                TextSpan(text: 'Powered by\n'),
+                                TextSpan(text: 'Reggie Vision™', style: TextStyle(fontWeight: FontWeight.bold)),
+                              ]),
                             ),
-                          )),
-                    ),
-                    Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(style: TextStyle(color: Colors.white), children: [
-                              TextSpan(text: 'Powered by\n'),
-                              TextSpan(text: 'Reggie Vision™', style: TextStyle(fontWeight: FontWeight.bold)),
-                            ]),
-                          ),
-                        ))
-                  ],
+                          ))
+                    ],
+                  ),
                 );
               }),
         ),

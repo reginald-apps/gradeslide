@@ -53,39 +53,75 @@ class GSConstants {
     ])
   ];
 
-  static final Color defaultColor = Colors.blue;
-  static final ThemeData defaultTheme = ThemeData(
-      primarySwatch: defaultColor,
-      primaryColor: defaultColor,
-      accentColor: defaultColor,
-      brightness: Brightness.light,
+  static ThemeData darkMode(Color favColor) {
+    return ThemeData(
+      primaryColor: favColor,
+      accentColor: favColor,
+      brightness: Brightness.dark,
+      highlightColor: favColor.withOpacity(.1),
       fontFamily: "Montserrat-Bold",
-      snackBarTheme: SnackBarThemeData(backgroundColor: defaultColor),
-      bottomSheetTheme: BottomSheetThemeData(backgroundColor: defaultColor, modalBackgroundColor: Colors.transparent),
-      canvasColor: Color.fromARGB(255, 51, 104, 170),
+      snackBarTheme: SnackBarThemeData(backgroundColor: favColor),
       toggleableActiveColor: Colors.green[200],
-      unselectedWidgetColor: Colors.white70,
-      cursorColor: defaultColor,
-      sliderTheme: SliderThemeData(tickMarkShape: GSTickMark(tickMarkRadius: 0.5), trackHeight: 2.5, valueIndicatorColor: defaultColor),
+      sliderTheme: SliderThemeData(tickMarkShape: GSTickMark(tickMarkRadius: 0.5), trackHeight: 2.5),
       tabBarTheme: TabBarTheme(
-          labelColor: defaultColor,
-          indicator: BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15)), color: Colors.white),
-          unselectedLabelColor: Colors.white),
-      scaffoldBackgroundColor: Color.fromARGB(255, 51, 104, 170),
+          labelColor: favColor,
+          indicator: BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15)), color: Colors.white10),
+          unselectedLabelColor: Colors.grey),
       appBarTheme: AppBarTheme(
-        centerTitle: true,
         color: Colors.transparent,
+        centerTitle: true,
         elevation: 0.0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Colors.grey),
+        textTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
       ),
       buttonTheme: ButtonThemeData(
-        buttonColor: defaultColor,
+        buttonColor: favColor,
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(foregroundColor: Colors.white),
       textTheme: TextTheme(
-          subtitle1: TextStyle(color: Colors.white),
-          headline6: TextStyle(color: defaultColor, shadows: [Shadow(color: defaultColor, blurRadius: 0)]),
-          bodyText2: TextStyle(color: defaultColor, shadows: [Shadow(color: defaultColor, blurRadius: 0)]),
-          bodyText1: TextStyle(color: defaultColor, shadows: [Shadow(color: defaultColor, blurRadius: 1)])),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(unselectedItemColor: Colors.white));
+          //headline6: TextStyle(color: favColor),
+          bodyText2: TextStyle(color: favColor),
+          bodyText1: TextStyle(color: favColor)),
+    );
+  }
+
+  static ThemeData defaultTheme(Color favColor) {
+    return ThemeData(
+        primarySwatch: favColor,
+        primaryColor: favColor,
+        accentColor: favColor,
+        brightness: Brightness.light,
+        highlightColor: favColor.withOpacity(.10),
+        fontFamily: "Montserrat-Bold",
+        snackBarTheme: SnackBarThemeData(backgroundColor: favColor),
+        bottomSheetTheme: BottomSheetThemeData(backgroundColor: favColor, modalBackgroundColor: Colors.transparent),
+        //canvasColor: Color.fromARGB(255, 51, 104, 170),
+        canvasColor: Colors.transparent,
+        toggleableActiveColor: Colors.green[200],
+        unselectedWidgetColor: Colors.white70,
+        cursorColor: favColor,
+        sliderTheme: SliderThemeData(tickMarkShape: GSTickMark(tickMarkRadius: 0.5), trackHeight: 2.5, valueIndicatorColor: favColor),
+        tabBarTheme: TabBarTheme(
+            labelColor: favColor,
+            indicator: BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15)), color: Colors.white),
+            unselectedLabelColor: Colors.white),
+        scaffoldBackgroundColor: Color.fromARGB(255, 51, 104, 170),
+        appBarTheme: AppBarTheme(
+          centerTitle: true,
+          color: Colors.transparent,
+          elevation: 0.0,
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
+        buttonTheme: ButtonThemeData(
+          buttonColor: favColor,
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(foregroundColor: Colors.white),
+        inputDecorationTheme: InputDecorationTheme(border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white))),
+        textTheme: TextTheme(
+            subtitle1: TextStyle(color: Colors.grey),
+            headline6: TextStyle(color: favColor, shadows: [Shadow(color: favColor, blurRadius: 0)]),
+            bodyText2: TextStyle(color: favColor, shadows: [Shadow(color: favColor, blurRadius: 0)]),
+            bodyText1: TextStyle(color: favColor, shadows: [Shadow(color: favColor, blurRadius: 1)])),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(unselectedItemColor: Colors.white));
+  }
 }

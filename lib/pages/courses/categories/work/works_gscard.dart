@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_gscard_gspicker.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_gscard_gstrack.dart';
+import 'package:provider/provider.dart';
 
 class GSCardWork extends StatefulWidget {
   final int id;
@@ -26,7 +28,7 @@ class _GSCardWorkState extends State<GSCardWork> {
   Widget build(BuildContext context) {
     var work = widget.work;
     var titleColor = Colors.white;
-    var db = DatabaseService();
+    DatabaseService db = Provider.of<DatabaseService>(context);
     return Container(
       decoration: BoxDecoration(
           color: work.completed
@@ -93,11 +95,21 @@ class _GSCardWorkState extends State<GSCardWork> {
                         flex: 6,
                         child: Padding(
                           padding: const EdgeInsets.only(left: 0, top: 10.0),
-                          child: Text(
-                            "${work.name}",
-                            textAlign: TextAlign.center,
-                            textScaleFactor: 1.20,
-                            style: TextStyle(decoration: TextDecoration.underline, color: titleColor),
+                          child: Column(
+                            children: [
+                              SizedBox(height: 15),
+                              Text(
+                                "${work.name}",
+                                textAlign: TextAlign.center,
+                                textScaleFactor: 1.20,
+                                style: TextStyle(decoration: TextDecoration.underline, color: titleColor, fontWeight: FontWeight.w900),
+                              ),
+                              Text(
+                                "${work.pointsEarned}/${work.pointsMax}",
+                                style: TextStyle(color: titleColor.withOpacity(.5)),
+                                textScaleFactor: 1.0,
+                              )
+                            ],
                           ),
                         ),
                       ),
@@ -126,7 +138,7 @@ class _GSCardWorkState extends State<GSCardWork> {
                             ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),

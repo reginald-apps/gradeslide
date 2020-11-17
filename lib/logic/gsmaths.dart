@@ -12,6 +12,10 @@ class GradeSlideMaths {
     return (weightsTillStart * 100).roundToDouble() / 100;
   }
 
+  static Stream<List<double>> getGTM(List<Category> categoriesInCourse) {
+    //print(categoriesInCourse);
+  }
+
   static double getWeightRemaining(List<Category> categoriesInCourse, Category categoryStart, double weight) {
     double totalWeights = 0;
     for (Category category in categoriesInCourse) {

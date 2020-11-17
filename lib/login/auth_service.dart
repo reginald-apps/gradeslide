@@ -2,34 +2,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_twitter/flutter_twitter.dart';
-import 'package:gradeslide/login/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  static final TwitterLogin _twitterLogin = TwitterLogin(
-    consumerKey: "OyOLKF2YT4OpwEbs1oCohpzQp",
-    consumerSecret: "sy1iuqV620sCJ06EfDedmA6TOlJ9quRErOMr0R3YrmvoH6E4Kd",
-  );
-
-  User _userFromFirebase(FirebaseUser user) {
-    return user != null ? User(uid: user.uid) : null;
-  }
-
+  static FirebaseAuth _auth = FirebaseAuth.instance;
   Stream<FirebaseUser> get user {
     return _auth.onAuthStateChanged;
   }
 
-  Future<User> signInAnon() async {
-    FirebaseUser user;
+  Future<AuthResult> signInAnon() async {
+    AuthResult result;
     try {
-      AuthResult result = await _auth.signInAnonymously();
-      user = result.user;
+      result = await _auth.signInAnonymously();
     } catch (e) {
-      print(e);
+      throw e;
     }
-    return _userFromFirebase(user);
+    return result;
   }
 
   Future<FirebaseUser> signIn(String email, String password, BuildContext context) async {
@@ -78,24 +66,5 @@ class AuthService {
       }
     }
     return user;
-  }
-
-  Future<User> signInWithTwitter() async {
-    final TwitterLoginResult result = await _twitterLogin.authorize();
-    try {
-      switch (result.status) {
-        case TwitterLoginStatus.loggedIn:
-          print(result.session.userId);
-          break;
-        case TwitterLoginStatus.cancelledByUser:
-          break;
-        case TwitterLoginStatus.error:
-          print(result.errorMessage);
-          break;
-      }
-    } catch (e) {
-      print(e);
-    }
-    return User(uid: result.session.userId);
   }
 }

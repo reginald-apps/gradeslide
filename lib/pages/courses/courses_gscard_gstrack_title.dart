@@ -21,7 +21,7 @@ class _GSTrackCourseTitleState extends State<GSTrackCourseTitle> with SingleTick
 
   @override
   void initState() {
-    _animation = AnimationController(vsync: this, duration: Duration(milliseconds: 500))
+    _animation = AnimationController(vsync: this, duration: Duration(milliseconds: 250))
       ..addStatusListener((status) {
         switch (status) {
           case AnimationStatus.completed:
@@ -47,15 +47,14 @@ class _GSTrackCourseTitleState extends State<GSTrackCourseTitle> with SingleTick
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      key: ValueKey("Title123"),
       animation: _animation,
       builder: (context, _) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildTitle("Grade:", Colors.green, widget.grade, TextAlign.start, _scaleAnimation, _gradeChanging),
-            _buildTitle("Target:", Colors.amber, widget.target, TextAlign.center, _scaleAnimation, _targetChanging),
-            _buildTitle("Max:", Colors.red, widget.max, TextAlign.end, _scaleAnimation, _maxChanging),
+            Expanded(child: _buildTitle("Current:", Colors.green, widget.grade, TextAlign.start, _scaleAnimation, _gradeChanging)),
+            Expanded(child: _buildTitle("Target:", Colors.amber, widget.target, TextAlign.center, _scaleAnimation, _targetChanging)),
+            Expanded(child: _buildTitle("Max:", Colors.red, widget.max, TextAlign.end, _scaleAnimation, _maxChanging)),
           ],
         );
       },
@@ -65,11 +64,13 @@ class _GSTrackCourseTitleState extends State<GSTrackCourseTitle> with SingleTick
   Widget _buildTitle(String title, Color titleColor, double value, TextAlign alignment, Animation animation, bool changing) {
     return Transform.scale(
       scale: changing ? (_scaleAnimation.value / 8) + 1.0 : 1,
-      child: Text(
-        "$title\n${(value * 100).truncate()}%",
-        style: TextStyle(color: titleColor, shadows: [Shadow(color: titleColor, blurRadius: changing ? _scaleAnimation.value * 3 : 2)], fontSize: 18),
-        textAlign: alignment,
-        //textScaleFactor: 1.25,
+      child: Container(
+        child: Text(
+          "$title\n${(value * 100).truncate()}%",
+          style: TextStyle(color: titleColor, shadows: [Shadow(color: titleColor, blurRadius: changing ? _scaleAnimation.value * 3 : 2)], fontSize: 18),
+          textAlign: alignment,
+          //textScaleFactor: 1.25,
+        ),
       ),
     );
   }
@@ -77,10 +78,17 @@ class _GSTrackCourseTitleState extends State<GSTrackCourseTitle> with SingleTick
   @override
   void didUpdateWidget(GSTrackCourseTitle oldWidget) {
     if (mounted) {
-      if (widget.grade != oldWidget.grade || widget.max != oldWidget.max) {
+      if (widget.grade != oldWidget.grade && widget.max != oldWidget.max) {
         _gradeChanging = true;
-        _targetChanging = true;
+        _targetChanging = false;
         _maxChanging = true;
+        setState(() {
+          _animation.forward();
+        });
+      } else if (widget.grade != oldWidget.grade) {
+        _gradeChanging = true;
+        _targetChanging = false;
+        _maxChanging = false;
         setState(() {
           _animation.forward();
         });
@@ -88,6 +96,13 @@ class _GSTrackCourseTitleState extends State<GSTrackCourseTitle> with SingleTick
         _gradeChanging = false;
         _targetChanging = true;
         _maxChanging = false;
+        setState(() {
+          _animation.forward();
+        });
+      } else if (widget.max != oldWidget.max) {
+        _gradeChanging = false;
+        _targetChanging = false;
+        _maxChanging = true;
         setState(() {
           _animation.forward();
         });

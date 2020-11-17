@@ -24,9 +24,11 @@ Course _$CourseFromJson(String documentId, Map<String, dynamic> json) {
     documentId: documentId,
     prefix: json['prefix'] as String ?? "N/A",
     id: json['id'] as int ?? 101,
+    index: json['index'] as int ?? -1,
     title: json['title'] as String ?? "UNTITLED COURSE",
     credits: json['credits'] as int ?? 3,
     totalPoints: json['totalPoints'] as int ?? 1000,
+    isShowMore: json['isShowMore'] as bool ?? false,
     sorts: (json['sorts'] as List)
         ?.map((e) => e == null
             ? false
@@ -56,7 +58,7 @@ Category _$CategoryFromJson(String documentId, Map<String, dynamic> json) {
     index: json['index'] as int ?? -1,
     name: json['name'] as String ?? "UNTITLED",
     weight: json['weight'] as double ?? 0.1,
-    isShowMore: json['isShowMore'] as bool ?? false,
+    isShowingMore: json['isShowMore'] as bool ?? false,
     sorts: (json['sorts'] as List)
         ?.map((e) => e == null
             ? false
@@ -68,8 +70,7 @@ Category _$CategoryFromJson(String documentId, Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$CategoryToJson(Category instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$CategoryToJson(Category instance) => <String, dynamic>{
       'name': instance.name,
       'index': instance.index,
       'weight': instance.weight,
@@ -88,8 +89,7 @@ Work _$WorkFromJson(String documentId, Map<String, dynamic> json) {
       duedate: json['duedate'] as Timestamp ?? Timestamp.now());
 }
 
-Map<String, dynamic> _$WorkToJson(Work instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$WorkToJson(Work instance) => <String, dynamic>{
       'name': instance.name,
       'index': instance.index,
       'pointsMax': instance.pointsMax,

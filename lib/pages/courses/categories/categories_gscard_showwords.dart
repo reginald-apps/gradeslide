@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
-import 'package:gradeslide/logic/gsmaths.dart';
+import 'package:gradeslide/pages/courses/categories/work/works_gscard_gspicker.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_gscard_gstrack.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_page.dart';
+import 'package:provider/provider.dart';
 
 class ShowWorks extends StatefulWidget {
   final List<Work> works;
@@ -38,12 +40,13 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
     _controller.addListener(() {
       setState(() {});
     });
+    print(_sizeAnimation.status);
     switch (_sizeAnimation.status) {
       case AnimationStatus.completed:
         _controller.reverse();
         break;
       case AnimationStatus.dismissed:
-        if (widget.category.isShowMore) {
+        if (widget.category.isShowingMore) {
           _controller.reverse();
         } else {
           _controller.forward();
@@ -62,29 +65,24 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
     super.dispose();
   }
 
-  _toggleExpand() {
-    setState(() {
-      DatabaseService().updateisShowMore(widget.category.documentId, !widget.category.isShowMore);
-    });
-    switch (_sizeAnimation.status) {
-      case AnimationStatus.completed:
-        _controller.reverse();
-        break;
-      case AnimationStatus.dismissed:
-        _controller.forward();
-        break;
-      case AnimationStatus.reverse:
-      case AnimationStatus.forward:
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          _toggleExpand();
+          DatabaseService db = DatabaseService();
+          db.updateCategoryIsShowMore(widget.category.documentId, !widget.category.isShowingMore);
+          switch (_sizeAnimation.status) {
+            case AnimationStatus.completed:
+              _controller.reverse();
+              break;
+            case AnimationStatus.dismissed:
+              _controller.forward();
+              break;
+            case AnimationStatus.reverse:
+            case AnimationStatus.forward:
+              break;
+          }
         });
       },
       child: LayoutBuilder(builder: (context, constraints) {
@@ -98,7 +96,7 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
                   child: Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Text(
-                      widget.category.isShowMore ? "Show ${widget.works.length} ${widget.category.name}" : "Show Less",
+                      widget.category.isShowingMore ? "Show ${widget.works.length} ${widget.category.name}" : "Show Less",
                       textScaleFactor: .85,
                       style: TextStyle(color: Colors.grey.withOpacity(.50)),
                       textAlign: TextAlign.center,
@@ -110,9 +108,10 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
                   child: Column(
                     children: [
                       Divider(
+                        thickness: 1,
                         height: 5,
-                        endIndent: 10,
-                        indent: 10,
+                        endIndent: 5,
+                        indent: 5,
                       ),
                       Container(
                         height: 30,
@@ -155,7 +154,7 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
                             Expanded(
                               flex: 2,
                               child: Padding(
-                                padding: const EdgeInsets.only(right: 10.0),
+                                padding: const EdgeInsets.only(right: 0.0),
                                 child: Text("Score",
                                     textScaleFactor: .75,
                                     textAlign: TextAlign.right,
@@ -184,107 +183,98 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
                                   },
                                   child: Column(
                                     children: [
-                                      Container(
-                                        height: 30,
-                                        color: e.value.completed ? Colors.green[400] : Colors.amber[700],
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                  flex: 3,
-                                                  child: Stack(
-                                                    children: [
-                                                      Icon(
-                                                        e.value.completed ? Icons.check : null,
-                                                        color: Colors.white.withOpacity(.75),
-                                                      ),
-                                                      Padding(
-                                                        padding: EdgeInsets.only(left: 35, top: 2),
-                                                        child: Text(
-                                                          "#${e.key + 1}",
-                                                          style: TextStyle(color: Colors.white),
-                                                          textAlign: TextAlign.left,
+                                      Opacity(
+                                        opacity: .85,
+                                        child: Container(
+                                          height: 35,
+                                          color: e.value.completed ? Colors.green[400] : Colors.amber[700],
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                    flex: 3,
+                                                    child: Stack(
+                                                      children: [
+                                                        Icon(
+                                                          e.value.completed ? Icons.check : null,
+                                                          color: Colors.white.withOpacity(.75),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  )),
-                                              Expanded(
-                                                  flex: 8,
-                                                  child: Text(
-                                                    "${e.value.name}",
-                                                    overflow: TextOverflow.ellipsis,
-                                                    style: TextStyle(color: Colors.white),
-                                                    textAlign: TextAlign.left,
-                                                  )),
-                                              Expanded(
-                                                  flex: 3,
-                                                  child: Row(
-                                                    children: [
-                                                      Column(
-                                                        children: [
-                                                          Text(
-                                                            "${e.value.pointsEarned}/",
+                                                        Padding(
+                                                          padding: EdgeInsets.only(left: 35, top: 2),
+                                                          child: Text(
+                                                            "#${e.key + 1}",
                                                             style: TextStyle(color: Colors.white),
-                                                            textAlign: TextAlign.center,
+                                                            textAlign: TextAlign.left,
                                                           ),
-                                                          Text("Points",
-                                                              textScaleFactor: .5,
+                                                        ),
+                                                      ],
+                                                    )),
+                                                Expanded(
+                                                    flex: 8,
+                                                    child: Text(
+                                                      "${e.value.name}",
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: TextStyle(color: Colors.white),
+                                                      textAlign: TextAlign.left,
+                                                    )),
+                                                Expanded(
+                                                    flex: 3,
+                                                    child: Row(
+                                                      children: [
+                                                        Column(
+                                                          children: [
+                                                            Text(
+                                                              "${e.value.pointsEarned}/",
+                                                              style: TextStyle(color: Colors.white),
                                                               textAlign: TextAlign.center,
-                                                              style: TextStyle(
-                                                                color: Colors.white.withOpacity(.75),
-                                                              ))
-                                                        ],
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                                            ),
+                                                            Text("Points",
+                                                                textScaleFactor: .5,
+                                                                textAlign: TextAlign.center,
+                                                                style: TextStyle(
+                                                                  color: Colors.white.withOpacity(.75),
+                                                                ))
+                                                          ],
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                                        ),
+                                                        Column(
+                                                          children: [
+                                                            Text(
+                                                              "${e.value.pointsMax}",
+                                                              style: TextStyle(color: Colors.white),
+                                                              textAlign: TextAlign.center,
+                                                            ),
+                                                          ],
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                        ),
+                                                      ],
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                    )),
+                                                Expanded(
+                                                    flex: 2,
+                                                    child: Text(
+                                                      "${((e.value.pointsEarned / e.value.pointsMax) * 100).truncate()}%",
+                                                      style: TextStyle(color: Colors.white),
+                                                      textAlign: TextAlign.end,
+                                                    )),
+                                                Expanded(
+                                                    flex: 1,
+                                                    child: Align(
+                                                      alignment: Alignment.centerRight,
+                                                      child: Container(
+                                                        height: 30,
+                                                        child: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white),
                                                       ),
-                                                      Column(
-                                                        children: [
-                                                          Text(
-                                                            "${e.value.pointsMax}",
-                                                            style: TextStyle(color: Colors.white),
-                                                            textAlign: TextAlign.center,
-                                                          ),
-                                                        ],
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                      ),
-                                                    ],
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                  )),
-                                              Expanded(
-                                                  flex: 2,
-                                                  child: Text(
-                                                    "${((e.value.pointsEarned / e.value.pointsMax) * 100).truncate()}%",
-                                                    style: TextStyle(color: Colors.white),
-                                                    textAlign: TextAlign.end,
-                                                  )),
-                                              Expanded(
-                                                  flex: 1,
-                                                  child: Align(
-                                                    alignment: Alignment.centerRight,
-                                                    child: Container(
-                                                      height: 30,
-                                                      child: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white),
-                                                    ),
-                                                  ))
-                                            ],
+                                                    ))
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                      Stack(
-                                        children: [
-                                          Container(
-                                            height: 31,
-                                            color: e.value.completed ? Colors.green[200] : Colors.orange[200],
-                                          ),
-                                          Center(
-                                            child: Container(
-                                                width: constraints.maxWidth * widget.category.weight * 1.0 * GradeSlideMaths.getWorth(widget.works, e.value),
-                                                child: GSTrackWork(e.value, false, true)),
-                                          ),
-                                        ],
-                                      )
+                                      Container(color: e.value.completed ? Colors.green[400] : Colors.orange[200], child: GSTrackWork(e.value, false, true)),
                                     ],
                                   ),
                                 ))

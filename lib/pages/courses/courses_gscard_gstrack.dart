@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:ui' as ui;
-
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flare_flutter/flare_cache_builder.dart';
 import 'package:flare_flutter/provider/asset_flare.dart';
@@ -11,7 +9,9 @@ import 'package:flutter/widgets.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
 import 'package:gradeslide/logic/gsmaths.dart';
+import 'package:gradeslide/pages/courses/courses_gscard_gstrack_marker.dart';
 import 'package:gradeslide/pages/courses/courses_gscard_gstrack_title.dart';
+import 'package:provider/provider.dart';
 
 class GSTrackCourse extends StatefulWidget {
   final Course course;
@@ -26,7 +26,8 @@ class _GSTrackCourseState extends State<GSTrackCourse> with SingleTickerProvider
   AnimationController _controller;
   CurvedAnimation _animation;
   Stream categoriesStream;
-  double courseGrade;
+  double courseCurrent;
+  double courseCurrentLost;
   double courseTarget;
   double courseMax;
   double zoomFactor;
@@ -36,10 +37,22 @@ class _GSTrackCourseState extends State<GSTrackCourse> with SingleTickerProvider
     _controller = AnimationController(duration: Duration(milliseconds: 500), vsync: this);
     _animation = CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn);
     _controller.forward();
-    courseGrade = 0;
+    courseCurrent = 0;
     courseTarget = 0;
+    courseCurrentLost = 0;
     courseMax = 0;
     zoomFactor = 1;
+    switch (_animation.status) {
+      case AnimationStatus.completed:
+        setState(() {});
+        break;
+      case AnimationStatus.dismissed:
+        break;
+      case AnimationStatus.reverse:
+        break;
+      case AnimationStatus.forward:
+        break;
+    }
     super.initState();
   }
 
@@ -52,15 +65,13 @@ class _GSTrackCourseState extends State<GSTrackCourse> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     zoomFactor = 1;
-    var db = DatabaseService();
+    DatabaseService db = Provider.of<DatabaseService>(context);
     var weightAccepted = false;
     var totalWeight = 0.0;
     var isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    categoriesStream = db.streamCategories(widget.course.documentId);
-
-    return StreamBuilder<List<Category>>(
-      stream: categoriesStream,
-      builder: (context, _) {
+    return FutureBuilder(
+      future: Future.delayed(Duration(milliseconds: 100)),
+      builder: (context, snapshot) {
         return StreamBuilder<List<Category>>(
             stream: db.streamCategories(widget.course.documentId),
             builder: (context, categoriesSnapshot) {
@@ -86,9 +97,11 @@ class _GSTrackCourseState extends State<GSTrackCourse> with SingleTickerProvider
                 padding: const EdgeInsets.only(left: 15.0, top: 0, bottom: 0, right: 15.0),
                 child: LayoutBuilder(builder: (context, constraints) {
                   double trackHeight = 15; //TODO: iPhone: 15, Tablet: 30
-                  double width = constraints.maxWidth;
+                  double trackLength = constraints.maxWidth;
                   double borderRadius = 15;
-
+                  double rowGrade = 0;
+                  double rowTarget = 0;
+                  double rowMax = 0;
                   return Column(
                     children: <Widget>[
                       Stack(
@@ -100,7 +113,7 @@ class _GSTrackCourseState extends State<GSTrackCourse> with SingleTickerProvider
                                 color: Colors.transparent,
                                 borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
                                 backgroundBlendMode: BlendMode.color,
-                                border: Border.all(width: 2.5, color: isDarkMode ? Colors.black.withOpacity(.25) : Colors.white10.withOpacity(.15))),
+                                border: Border.all(width: 2.5, color: isDarkMode ? Colors.white.withOpacity(.25) : Colors.white10.withOpacity(.15))),
                             child: ClipRRect(
                                 borderRadius: BorderRadius.circular(borderRadius),
                                 child: Stack(children: <Widget>[
@@ -113,7 +126,7 @@ class _GSTrackCourseState extends State<GSTrackCourse> with SingleTickerProvider
                                       color: Colors.orange,
                                     ),
                                     height: trackHeight,
-                                    width: width,
+                                    width: trackLength,
                                   ),
                                   FadeTransition(
                                     opacity: _animation,
@@ -130,42 +143,11 @@ class _GSTrackCourseState extends State<GSTrackCourse> with SingleTickerProvider
                                           animation: "Progress",
                                         ),
                                         height: trackHeight,
-                                        width: width,
+                                        width: trackLength,
                                       );
                                     }),
                                   ),
-                                  AnimatedBuilder(
-                                      animation: _controller,
-                                      builder: (context, _) {
-                                        double rowGrade = 0;
-                                        double rowTarget = 0;
-                                        double rowMax = 0;
-                                        return Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: categoriesInCourse.map((category) {
-                                            return StreamBuilder<List<Work>>(
-                                                stream: db.streamWorks(category.documentId),
-                                                builder: (context, workListSnapshot) {
-                                                  List<Work> works = [];
-                                                  if (workListSnapshot.hasData) {
-                                                    works = workListSnapshot.data;
-                                                    rowMax += GradeSlideMaths.getCategoryMaximumTargetGrade(works) * category.weight;
-                                                    rowGrade += GradeSlideMaths.getCategoryCompletedGrade(works, true) * category.weight;
-                                                    rowTarget += GradeSlideMaths.getCategoryTargetGrade(works) * category.weight;
-                                                  }
-                                                  if (workListSnapshot.connectionState == ConnectionState.waiting &&
-                                                      categoriesSnapshot.connectionState == ConnectionState.waiting) {
-                                                    courseMax = (rowMax * 100).round() / 100;
-                                                    courseGrade = (rowGrade * 100).round() / 100;
-                                                    courseTarget = (rowTarget * 100).round() / 100;
-                                                  }
-                                                  return Container();
-                                                });
-                                          }).toList(),
-                                        );
-                                      }),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: categoriesInCourse.map((category) {
                                       return StreamBuilder<List<Work>>(
                                           stream: db.streamWorks(category.documentId),
@@ -174,47 +156,50 @@ class _GSTrackCourseState extends State<GSTrackCourse> with SingleTickerProvider
                                             if (workListSnapshot.hasData) {
                                               workList = workListSnapshot.data;
                                             }
-                                            return AnimatedContainer(
-                                              color: Colors.red,
-                                              height: trackHeight,
-                                              width: workList.isNotEmpty
-                                                  ? width * zoomFactor * (1 - GradeSlideMaths.getCategoryMaximumTargetGrade(workList)) * category.weight
-                                                  : 0,
-                                              duration: Duration(milliseconds: 500),
-                                              curve: Curves.ease,
-                                            );
+                                            if (workListSnapshot.hasData) {
+                                              List<Work> works = [];
+                                              works = workListSnapshot.data;
+                                              if (categoriesSnapshot.connectionState != ConnectionState.active &&
+                                                  workListSnapshot.connectionState != ConnectionState.active) {
+                                                rowMax += GradeSlideMaths.getCategoryMaximumTargetGrade(works) * category.weight;
+                                                rowGrade += GradeSlideMaths.getCategoryCompletedGrade(works, true) * category.weight;
+                                                rowTarget += GradeSlideMaths.getCategoryTargetGrade(works) * category.weight;
+                                                courseMax = (rowMax * 100).round() / 100;
+                                                courseCurrentLost = 1 - (rowMax * 100).round() / 100;
+                                                courseCurrent = (rowGrade * 100).round() / 100;
+                                                courseTarget = (rowTarget * 100).round() / 100;
+                                              }
+                                            }
+                                            return Container();
                                           });
                                     }).toList(),
                                   ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: categoriesInCourse.map((category) {
-                                      return StreamBuilder<List<Work>>(
-                                          stream: db.streamWorks(category.documentId),
-                                          builder: (context, worksSnapshot) {
-                                            List<Work> works = [];
-                                            if (worksSnapshot.hasData) {
-                                              works = worksSnapshot.data;
-                                            }
-                                            return AnimatedContainer(
-                                              color: Colors.green,
-                                              height: trackHeight,
-                                              width:
-                                                  works.isNotEmpty ? width / zoomFactor * (GradeSlideMaths.getCategoryCompletedGrade(works, true)) * category.weight : 0,
-                                              duration: Duration(milliseconds: 500),
-                                              curve: Curves.ease,
-                                            );
-                                          });
-                                    }).toList(),
+                                  Positioned(
+                                    right: 0,
+                                    child: AnimatedContainer(
+                                      duration: Duration(milliseconds: 1000),
+                                      curve: Curves.ease,
+                                      color: Colors.red,
+                                      height: trackHeight,
+                                      width: trackLength * (courseCurrentLost),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    left: 0,
+                                    child: AnimatedContainer(
+                                      duration: Duration(milliseconds: 1000),
+                                      curve: Curves.ease,
+                                      color: Colors.green,
+                                      height: trackHeight,
+                                      width: trackLength * (courseCurrent),
+                                    ),
                                   ),
                                 ])),
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      GSTrackCourseTitle(grade: courseGrade, target: courseTarget, max: courseMax),
+                      SizedBox(height: 5),
+                      GSTrackCourseTitle(grade: courseCurrent, target: courseTarget, max: courseMax),
                     ],
                   );
                 }),
@@ -222,51 +207,5 @@ class _GSTrackCourseState extends State<GSTrackCourse> with SingleTickerProvider
             });
       },
     );
-  }
-
-  Widget _buildLine(double position, BoxConstraints constraints, Color color) {
-    return CustomPaint(
-      foregroundPainter: DiagnolLine(position, constraints, color),
-    );
-  }
-}
-
-class DiagnolLine extends CustomPainter {
-  double _percentage;
-  BoxConstraints _constraints;
-  Color _color;
-
-  DiagnolLine(this._percentage, this._constraints, this._color);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    double startOffset = 0;
-    if (_color == Colors.red) {
-      startOffset = (_constraints.maxWidth) - (_constraints.maxWidth * _percentage) - 20;
-    } else if (_color == Colors.green) {
-      startOffset = 23 - (_constraints.maxWidth * _percentage);
-    } else {
-      startOffset = (_constraints.maxWidth / 2) - (_constraints.maxWidth * _percentage) + 8;
-    }
-    final pointMode = ui.PointMode.polygon;
-    final points = [
-      Offset(1, -14),
-      Offset(0, 6),
-    ];
-    final paint = Paint()
-      ..color = _color
-      ..strokeWidth = 1
-      ..strokeCap = StrokeCap.round;
-    canvas.drawPoints(pointMode, points, paint);
-    final paint2 = Paint()
-      ..color = _color
-      ..strokeWidth = 1
-      ..strokeCap = StrokeCap.round;
-    canvas.drawPoints(ui.PointMode.polygon, points, paint2);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
   }
 }

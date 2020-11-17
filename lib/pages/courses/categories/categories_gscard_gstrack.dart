@@ -1,8 +1,10 @@
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
 import 'package:gradeslide/logic/gsmaths.dart';
+import 'package:provider/provider.dart';
 
 class GSTrackCategory extends StatefulWidget {
   final Category category;
@@ -33,7 +35,7 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    var db = DatabaseService();
+    DatabaseService db = Provider.of<DatabaseService>(context);
     Category category = widget.category;
     double height = 15; //TODO: iPhone: 15, Tablet: 22
     double goalSize = 1.5;
@@ -65,7 +67,7 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
                                 width: trackLength * category.weight,
                                 foregroundDecoration: Theme.of(context).brightness == Brightness.dark
                                     ? BoxDecoration(
-                                        border: Border.all(width: 2.5, color: Colors.black.withOpacity(.25)), borderRadius: BorderRadius.all(Radius.circular(15)))
+                                        border: Border.all(width: 2.5, color: Colors.white.withOpacity(.25)), borderRadius: BorderRadius.all(Radius.circular(15)))
                                     : BoxDecoration(
                                         color: Colors.transparent,
                                         borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -107,7 +109,7 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
                                       ),
                                     ),
                                     Positioned(
-                                      right: (trackLength * category.weight) - progressStart - progressEnd,
+                                      right: 0,
                                       child: AnimatedContainer(
                                         duration: Duration(milliseconds: 250),
                                         curve: Curves.ease,

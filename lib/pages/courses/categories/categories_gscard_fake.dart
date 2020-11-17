@@ -9,21 +9,17 @@ import 'package:gradeslide/pages/courses/categories/categories_gscard_showwords.
 import 'package:gradeslide/pages/courses/categories/work/works_page.dart';
 import 'package:provider/provider.dart';
 
-class GSCardCategory extends StatefulWidget {
-  final Course course;
-  final String courseKey;
-  final List<Category> categoriesInCourse;
+class GSCardCategoryFake extends StatefulWidget {
   final Category category;
-  final Function(int) onSlide;
   final bool isEditingMode;
-
-  const GSCardCategory(this.course, this.category, this.courseKey, this.categoriesInCourse, this.isEditingMode, this.onSlide);
+  final Function onRemove;
+  const GSCardCategoryFake(this.category, this.isEditingMode, this.onRemove);
 
   @override
-  _GSCardCategoryState createState() => _GSCardCategoryState();
+  _GSCardCategoryFakeState createState() => _GSCardCategoryFakeState();
 }
 
-class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProviderStateMixin {
+class _GSCardCategoryFakeState extends State<GSCardCategoryFake> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
@@ -31,21 +27,13 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    DatabaseService db = Provider.of<DatabaseService>(context);
-    List<Work> works = [];
     return MaterialButton(
       padding: EdgeInsets.zero,
       color: Theme.of(context).cardColor,
       child: Column(
         children: <Widget>[
           SafeArea(
-            child: StreamBuilder<List<Work>>(
-              stream: db.streamWorks(widget.category.documentId),
-              builder: (_, worksSnapshot) {
-                if (worksSnapshot.hasData) {
-                  works = worksSnapshot.data;
-                }
-                return Padding(
+              child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -53,6 +41,12 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
                     children: <Widget>[
                       Row(
                         children: <Widget>[
+                          MaterialButton(
+                            shape: CircleBorder(),
+                            child: Icon(Icons.remove),
+                            color: Colors.red,
+                            onPressed: widget.onRemove,
+                          ),
                           Expanded(
                             flex: 2,
                             child: Padding(
@@ -76,27 +70,14 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
                             ),
                           ),
                           Expanded(
-                            flex: 2,
+                            flex: 1,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: <Widget>[
                                 Row(
                                   children: <Widget>[
-                                    FutureBuilder<int>(
-                                        future: db.getTotalWorks(widget.category.documentId),
-                                        builder: (context, snapshot) {
-                                          return Row(
-                                            children: [
-                                              Text(
-                                                "${snapshot.data ?? 0}",
-                                                textScaleFactor: 1.50, //iPhone 1.5
-                                                style: Theme.of(context).textTheme.bodyText1,
-                                              ),
-                                            ],
-                                          );
-                                        }),
                                     Icon(
-                                      Icons.arrow_forward_ios,
+                                      Icons.menu,
                                       color: Colors.grey.withOpacity(.5),
                                     )
                                   ],
@@ -106,23 +87,9 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
                           ),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 7.0),
-                        child: GSTrackCategory(widget.category),
-                      ),
-                      ShowWorks(
-                        course: widget.course,
-                        category: widget.category,
-                        works: works,
-                        categoriesInCourse: widget.categoriesInCourse,
-                      ),
                       // GSTrackCategoryTitle(worksSnapshot.data),
                     ],
-                  ),
-                );
-              },
-            ),
-          ),
+                  ))),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: Container(
@@ -134,7 +101,6 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
       ),
       onPressed: () {
         //Scaffold.of(context).showBottomSheet((context) => WorksPage(widget.course, widget.category, widget.categoriesInCourse));
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => WorksPage(widget.course, widget.category, widget.categoriesInCourse, 0)));
       },
     );
   }
