@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +9,6 @@ import 'package:gradeslide/pages/courses/courses_gscard.dart';
 import 'package:gradeslide/pages/courses/courses_setup_step1.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class CoursesPage extends StatefulWidget {
   CoursesPage();
@@ -27,7 +24,6 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
   AnimationController _controller;
   Animation _animation;
   Animation<Offset> _offsetAnimation;
-  RefreshController _refreshController;
 
   @override
   void initState() {
@@ -36,7 +32,6 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
     courses = [];
     _controller = AnimationController(duration: Duration(seconds: 3), vsync: this)..forward();
     _animation = new Tween<double>(begin: 0.0, end: 1.0).animate(new CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
-    _refreshController = RefreshController(initialRefresh: false);
     super.initState();
   }
 
@@ -123,22 +118,15 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
                           ],
                         ))
                       : !isEditingMode
-                          ? SmartRefresher(
-                              onRefresh: () {
-                                setState(() {});
-                              },
-                              onOffsetChange: (val1, val2) {},
-                              controller: _refreshController,
-                              child: ListView(
-                                  //physics: AlwaysScrollableScrollPhysics(),
-                                  children: coursesSnapshot.hasData
-                                      ? coursesSnapshot.data
-                                          .asMap()
-                                          .entries
-                                          .map((course) => GSCardCourse(ValueKey(course.value.documentId), course.value, isEditingMode))
-                                          .toList()
-                                      : []),
-                            )
+                          ? ListView(
+                              //physics: AlwaysScrollableScrollPhysics(),
+                              children: coursesSnapshot.hasData
+                                  ? coursesSnapshot.data
+                                      .asMap()
+                                      .entries
+                                      .map((course) => GSCardCourse(ValueKey(course.value.documentId), course.value, isEditingMode))
+                                      .toList()
+                                  : [])
                           : ReorderableListView(
                               children: coursesSnapshot.hasData
                                   ? coursesSnapshot.data
