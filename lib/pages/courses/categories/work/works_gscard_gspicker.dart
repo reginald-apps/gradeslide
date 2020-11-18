@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
-import 'package:gradeslide/login/user.dart';
 import 'package:provider/provider.dart';
 
 class GSPickerWork extends StatefulWidget {

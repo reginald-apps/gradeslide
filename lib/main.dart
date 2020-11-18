@@ -11,8 +11,8 @@ import 'logic/database_service.dart';
 import 'login/sign_in.dart';
 
 void main() {
-  Firestore.instance.settings(persistenceEnabled: true);
   runApp(MyApp());
+  Firestore.instance.settings(persistenceEnabled: true);
 }
 
 class MyApp extends StatelessWidget {

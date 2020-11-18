@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:gradeslide/login/user.dart';
-
 import 'gsmaths.dart';
 
 class DatabaseService {
@@ -20,7 +18,7 @@ class DatabaseService {
         }).toList());
   }
 
-  Future<String> addCourse(User user) async {
+  Future<String> addCourse(FirebaseUser user) async {
     DocumentReference doc = await _coursesCollection.add({
       'userId': user.uid,
       'sorts': [false, true, true]
@@ -30,28 +28,28 @@ class DatabaseService {
 
   Future<String> addSampleCourse(FirebaseUser user) async {
     DocumentReference courseDocument = await _coursesCollection.add({
-      'title': "Chemistry",
+      'title': "Chemistry II",
       'userId': user.uid,
     });
     String courseKey = courseDocument.documentID;
     await Future.delayed(Duration(milliseconds: 200));
     String examsKey = await addCategory(courseKey, categoryName: "Exams", weight: 0.5);
-    addWork(examsKey, "Exam 1", 45, 50);
-    addWork(examsKey, "Exam 2", 40, 60);
+    addWork(examsKey, "Plant Life Exam", 45, 50);
+    addWork(examsKey, "Animal Life Exam", 40, 60);
     await Future.delayed(Duration(milliseconds: 400));
     String quizzesKey = await addCategory(courseKey, categoryName: "Quizzes", weight: 0.2);
-    addWork(quizzesKey, "Quiz 1", 10, 10);
-    addWork(quizzesKey, "Quiz 2", 5, 10);
-    addWork(quizzesKey, "Quiz 3", 9, 10);
-    addWork(quizzesKey, "Quiz 4", 10, 10);
+    addWork(quizzesKey, "Water Cycle Quiz", 10, 10);
+    addWork(quizzesKey, "Photosynthesis Quiz", 5, 10);
+    addWork(quizzesKey, "Cells Quiz", 9, 10);
+    addWork(quizzesKey, "ATP Quiz", 10, 10);
     await Future.delayed(Duration(milliseconds: 600));
     String homeworkKey = await addCategory(courseKey, categoryName: "Homework", weight: 0.05);
-    addWork(homeworkKey, "Homework 1", 4, 5);
-    addWork(homeworkKey, "Homework 2", 0, 5);
-    addWork(homeworkKey, "Homework 3", 1, 2);
-    addWork(homeworkKey, "Homework 4", 7, 10);
-    addWork(homeworkKey, "Homework 5", 10, 10);
-    addWork(homeworkKey, "Homework 6", 8, 10);
+    addWork(homeworkKey, "Water Cycle Homework", 4, 5);
+    addWork(homeworkKey, "Glucose Homework", 0, 5);
+    addWork(homeworkKey, "Photosynthesis Homework", 1, 2);
+    addWork(homeworkKey, "Mitochondria Homework", 7, 10);
+    addWork(homeworkKey, "Cells Homework", 10, 10);
+    addWork(homeworkKey, "ATP Homework", 8, 10);
     String finalKey = await addCategory(courseKey, categoryName: "Final Exam", weight: 0.25);
     addWork(finalKey, "Final Exam", 55, 60);
     return courseDocument.documentID;

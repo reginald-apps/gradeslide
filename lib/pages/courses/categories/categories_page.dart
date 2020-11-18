@@ -179,7 +179,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                                   )),
                                   Expanded(
                                       child: Text(
-                                    "Worth",
+                                    "Weight",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(fontWeight: FontWeight.w900, color: Colors.grey.withOpacity(.5)),
                                   )),

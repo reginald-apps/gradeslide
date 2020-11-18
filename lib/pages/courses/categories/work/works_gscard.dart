@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
+import 'package:gradeslide/logic/gsmaths.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_gscard_gspicker.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_gscard_gstrack.dart';
 import 'package:provider/provider.dart';
@@ -10,9 +11,11 @@ import 'package:provider/provider.dart';
 class GSCardWork extends StatefulWidget {
   final int id;
   final Work work;
+  final List<Work> works;
+  final double categoryWeight;
   final bool isEditingMode;
 
-  GSCardWork(this.id, this.work, this.isEditingMode);
+  GSCardWork(this.id, this.work, this.works, this.categoryWeight, this.isEditingMode);
 
   @override
   _GSCardWorkState createState() => _GSCardWorkState();
@@ -105,9 +108,10 @@ class _GSCardWorkState extends State<GSCardWork> {
                                 style: TextStyle(decoration: TextDecoration.underline, color: titleColor, fontWeight: FontWeight.w900),
                               ),
                               Text(
-                                "${work.pointsEarned}/${work.pointsMax}",
-                                style: TextStyle(color: titleColor.withOpacity(.5)),
-                                textScaleFactor: 1.0,
+                                "Adjusted Weight: ${(GradeSlideMaths.getWorth(widget.works, widget.work) * widget.categoryWeight).toStringAsPrecision(2)}",
+                                style: TextStyle(color: titleColor.withOpacity(.85)),
+                                textAlign: TextAlign.center,
+                                textScaleFactor: .75,
                               )
                             ],
                           ),
@@ -120,18 +124,25 @@ class _GSCardWorkState extends State<GSCardWork> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Container(
-                              height: 50,
-                              width: 80,
+                              width: 77.5,
                               child: Card(
                                 margin: EdgeInsets.only(right: 10.5, top: 12.5),
                                 color: work.completed ? Colors.transparent : Colors.orange,
                                 elevation: 0,
                                 child: Center(
-                                  child: Text(
-                                    "${((widget.work.pointsEarned / widget.work.pointsMax) * 100).toInt()}%",
-                                    textScaleFactor: 1.75,
-                                    textAlign: TextAlign.right,
-                                    style: TextStyle(color: titleColor),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        "${((widget.work.pointsEarned / widget.work.pointsMax) * 100).toInt()}%",
+                                        textScaleFactor: 1.75,
+                                        textAlign: TextAlign.right,
+                                        style: TextStyle(color: titleColor),
+                                      ),
+                                      Text(
+                                        "{${work.pointsEarned}/${work.pointsMax}}",
+                                        style: TextStyle(color: titleColor.withOpacity(.85)),
+                                      )
+                                    ],
                                   ),
                                 ),
                               ),

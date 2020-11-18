@@ -31,11 +31,11 @@ class SettingsPage extends StatelessWidget {
         children: <Widget>[
           buildHeader(context, "Features"),
           ListTile(
-            leading: Icon(Icons.help_outline_sharp),
-            title: Text("Helper Mode"),
+            leading: Icon(Icons.view_compact_rounded),
+            title: Text("Compact Mode"),
             trailing: Switch(
-              value: false,
-              onChanged: null,
+              value: true,
+              onChanged: (value) {},
             ),
           ),
           ListTile(
@@ -43,7 +43,7 @@ class SettingsPage extends StatelessWidget {
             title: Text("Progress Marker"),
             trailing: Switch(
               value: false,
-              onChanged: null,
+              onChanged: (value) {},
             ),
           ),
           ListTile(
@@ -51,7 +51,7 @@ class SettingsPage extends StatelessWidget {
             title: Text("Track Zoom"),
             trailing: Switch(
               value: false,
-              onChanged: null,
+              onChanged: (value) {},
             ),
           ),
           buildHeader(context, "Personalization"),

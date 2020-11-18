@@ -205,7 +205,7 @@ class _WorksPageState extends State<WorksPage> with SingleTickerProviderStateMix
                                   child: ListView(
                                     controller: _trackingScrollController,
                                     children: worksInCourse.asMap().entries.map((work) {
-                                      return GSCardWork(work.key, work.value, isEditingMode);
+                                      return GSCardWork(work.key, work.value, worksInCourse, widget.category.weight, isEditingMode);
                                     }).toList(),
                                   ),
                                 ),

@@ -70,7 +70,7 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
                             child: RichText(
                               textAlign: TextAlign.center,
                               text: TextSpan(
-                                  children: [TextSpan(text: "${(widget.category.weight * 100).truncate()}%", style: TextStyle(fontWeight: FontWeight.w900))],
+                                  children: [TextSpan(text: "${(widget.category.weight).toStringAsPrecision(2)}", style: TextStyle(fontWeight: FontWeight.w900))],
                                   style: Theme.of(context).textTheme.bodyText1),
                               textScaleFactor: 1.25,
                             ),

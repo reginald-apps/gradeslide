@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
-import 'package:gradeslide/pages/courses/categories/work/works_gscard_gspicker.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_gscard_gstrack.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_page.dart';
-import 'package:provider/provider.dart';
 
 class ShowWorks extends StatefulWidget {
   final List<Work> works;
@@ -182,6 +179,7 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
                                         .push(MaterialPageRoute(builder: (context) => WorksPage(widget.course, widget.category, widget.categoriesInCourse, e.key)));
                                   },
                                   child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
                                       Opacity(
                                         opacity: .85,
@@ -215,43 +213,15 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
                                                     child: Text(
                                                       "${e.value.name}",
                                                       overflow: TextOverflow.ellipsis,
-                                                      style: TextStyle(color: Colors.white),
+                                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
                                                       textAlign: TextAlign.left,
                                                     )),
                                                 Expanded(
                                                     flex: 3,
-                                                    child: Row(
-                                                      children: [
-                                                        Column(
-                                                          children: [
-                                                            Text(
-                                                              "${e.value.pointsEarned}/",
-                                                              style: TextStyle(color: Colors.white),
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                            Text("Points",
-                                                                textScaleFactor: .5,
-                                                                textAlign: TextAlign.center,
-                                                                style: TextStyle(
-                                                                  color: Colors.white.withOpacity(.75),
-                                                                ))
-                                                          ],
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                                        ),
-                                                        Column(
-                                                          children: [
-                                                            Text(
-                                                              "${e.value.pointsMax}",
-                                                              style: TextStyle(color: Colors.white),
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                          ],
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                        ),
-                                                      ],
-                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                    child: Text(
+                                                      "{${e.value.pointsEarned}/${e.value.pointsMax}}",
+                                                      style: TextStyle(color: Colors.white),
+                                                      textAlign: TextAlign.center,
                                                     )),
                                                 Expanded(
                                                     flex: 2,

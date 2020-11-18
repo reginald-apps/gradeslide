@@ -87,7 +87,7 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
           stream: db.streamCourses(user.uid),
           builder: (context, coursesSnapshot) {
             return FutureBuilder(
-                future: Future.delayed(Duration(milliseconds: 300)),
+                future: Future.delayed(Duration(milliseconds: 0)),
                 builder: (context, loadingScreenSnapshot) {
                   if (loadingScreenSnapshot.connectionState != ConnectionState.done) {
                     return LoadingScreen("Loading Courses");
