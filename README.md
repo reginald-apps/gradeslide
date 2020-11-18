@@ -1,5 +1,5 @@
 # Official GradeSlide Project 
-<p align="center">
+<p>
   <img src="https://github.com/reginald-apps/gradeslide/blob/stable/images/mainlogo.png" width="350" title="hover text">
 </p>
 <p style="color:blue;text-align:center;">
