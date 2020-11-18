@@ -1,4 +1,4 @@
-# gradeslide
+# GradeSlide
 
 GradeSlide on main PC
 
