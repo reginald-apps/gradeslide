@@ -80,11 +80,6 @@ class DatabaseService {
     streamCategories(courseKey).forEach((categoriesToDelete) {
       for (Category category in categoriesToDelete) {
         deleteCategory(category.documentId);
-        streamWorks(category.documentId).forEach((worksToDelete) {
-          for (Work work in worksToDelete) {
-            deleteWork(work.documentId);
-          }
-        });
       }
     });
     _coursesCollection.document(courseKey).delete();
