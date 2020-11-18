@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
         Provider.value(value: AuthService()),
       ],
       child: MaterialApp(
-        themeMode: ThemeMode.light,
+        themeMode: ThemeMode.dark,
         darkTheme: GSConstants.darkMode(Colors.blue),
         theme: GSConstants.defaultTheme(Colors.blue),
         home: Wrapper(),
