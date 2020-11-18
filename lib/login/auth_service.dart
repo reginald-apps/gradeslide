@@ -36,7 +36,7 @@ class AuthService {
             color: Colors.yellow,
           ),
           leftBarIndicatorColor: Colors.yellow,
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 1),
         )..show(context);
       }
     }

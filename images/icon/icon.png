@@ -1,0 +1,58 @@
+import 'package:flutter_web/material.dart';
+import 'package:firebase/firebase.dart' as fb;
+import 'package:firebase/firestore.dart' as fs;
+import 'package:flutter_web_ui/ui.dart' as ui;
+//import 'package:gradeslide_web/gradeslide/pages/main.dart' as app;
+
+import 'package:gradeslide_web/gradeslide/pages/login_screen.dart';
+import 'package:gradeslide_web/gradeslide/pages/home_page.dart';
+
+void main() async {
+  //await ui.webOnlyInitializePlatform();
+  runApp(MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final db = fb.firestore();
+  final auth = fb.auth();
+
+  @override
+  void initState() {
+    //db.enablePersistence();
+    super.initState();
+  }
+
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(
+          scaffoldBackgroundColor: Color.fromARGB(255, 51, 104, 170),
+          primaryColor: Color.fromARGB(255, 51, 104, 150),
+          fontFamily: "Fira",
+          brightness: Brightness.dark,
+          canvasColor: Color.fromARGB(255, 51, 104, 150),
+          //textTheme: TextTheme(body1: TextStyle(color: Colors.brown)),
+          sliderTheme: SliderThemeData(
+              trackHeight: 10,
+              thumbShape: RoundSliderThumbShape(disabledThumbRadius: 0),
+              thumbColor: Colors.red,
+              disabledThumbColor: Colors.orange,
+              disabledActiveTrackColor: Colors.orange,
+              tickMarkShape: RoundSliderTickMarkShape(tickMarkRadius: 0),
+              rangeThumbShape: RoundRangeSliderThumbShape(disabledThumbRadius: 8.5))),
+
+      //darkTheme: ThemeData(textTheme: TextTheme(title: TextStyle(color: Colors.purple), body1: TextStyle(color: Colors.purple))),
+      debugShowCheckedModeBanner: false,
+      home: StreamBuilder<fb.User>(
+          stream: auth.onAuthStateChanged,
+          builder: (context, snapshot) {
+            print(snapshot);
+            return snapshot.hasData ? HomePage(snapshot.data) : LoginScreen();
+          }),
+    );
+  }
+}
