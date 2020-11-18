@@ -79,6 +79,5 @@ flutter:
       - images/outlinedpencil.png
       - images/mainlogo.png
       - flares/progbar.flr
-      - assets/progbar.flr
 
   uses-material-design: true
