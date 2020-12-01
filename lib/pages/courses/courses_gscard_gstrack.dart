@@ -147,33 +147,6 @@ class _GSTrackCourseState extends State<GSTrackCourse> with SingleTickerProvider
                                       );
                                     }),
                                   ),
-                                  Row(
-                                    children: categoriesInCourse.map((category) {
-                                      return StreamBuilder<List<Work>>(
-                                          stream: db.streamWorks(category.documentId),
-                                          builder: (context, workListSnapshot) {
-                                            List<Work> workList = [];
-                                            if (workListSnapshot.hasData) {
-                                              workList = workListSnapshot.data;
-                                            }
-                                            if (workListSnapshot.hasData) {
-                                              List<Work> works = [];
-                                              works = workListSnapshot.data;
-                                              if (categoriesSnapshot.connectionState != ConnectionState.active &&
-                                                  workListSnapshot.connectionState != ConnectionState.active) {
-                                                rowMax += GradeSlideMaths.getCategoryMaximumTargetGrade(works) * category.weight;
-                                                rowGrade += GradeSlideMaths.getCategoryCompletedGrade(works, true) * category.weight;
-                                                rowTarget += GradeSlideMaths.getCategoryTargetGrade(works) * category.weight;
-                                                courseMax = (rowMax * 100).round() / 100;
-                                                courseCurrentLost = 1 - (rowMax * 100).round() / 100;
-                                                courseCurrent = (rowGrade * 100).round() / 100;
-                                                courseTarget = (rowTarget * 100).round() / 100;
-                                              }
-                                            }
-                                            return Container();
-                                          });
-                                    }).toList(),
-                                  ),
                                   Positioned(
                                     right: 0,
                                     child: AnimatedContainer(

@@ -9,8 +9,9 @@ class ShowWorks extends StatefulWidget {
   final Course course;
   final Category category;
   final List<Category> categoriesInCourse;
+  final Function(Category) onExpanded;
 
-  const ShowWorks({this.course, this.category, this.works, this.categoriesInCourse});
+  const ShowWorks({this.course, this.category, this.works, this.categoriesInCourse, this.onExpanded});
 
   @override
   _ShowWorksState createState() => _ShowWorksState();
@@ -37,7 +38,6 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
     _controller.addListener(() {
       setState(() {});
     });
-    print(_sizeAnimation.status);
     switch (_sizeAnimation.status) {
       case AnimationStatus.completed:
         _controller.reverse();
@@ -69,6 +69,7 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
         setState(() {
           DatabaseService db = DatabaseService();
           db.updateCategoryIsShowMore(widget.category.documentId, !widget.category.isShowingMore);
+          widget.onExpanded(widget.category);
           switch (_sizeAnimation.status) {
             case AnimationStatus.completed:
               _controller.reverse();

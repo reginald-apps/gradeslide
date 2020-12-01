@@ -202,12 +202,11 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                               controller: _trackingScrollController,
                               child: ListView.builder(
                                 controller: _trackingScrollController,
+                                physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                                 itemCount: categoriesInCourse.length,
                                 itemBuilder: (context, i) {
                                   return GSCardCategory(widget.course, categoriesInCourse[i], widget.course.documentId, categoriesInCourse, isEditingMode, (value) {
-                                    setState(() {
-                                      weightRemaining = value;
-                                    });
+                                    setState(() {});
                                   });
                                 },
                               ),

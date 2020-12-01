@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:get/get.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
 import 'package:gradeslide/pages/courses/categories/categories_gscard_gstrack.dart';
 import 'package:gradeslide/pages/courses/categories/categories_gscard_showwords.dart';
+import 'package:gradeslide/pages/courses/categories/work/works_gsstory.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_page.dart';
 import 'package:provider/provider.dart';
 
@@ -14,10 +14,10 @@ class GSCardCategory extends StatefulWidget {
   final String courseKey;
   final List<Category> categoriesInCourse;
   final Category category;
-  final Function(int) onSlide;
+  final Function(Category) onExpanded;
   final bool isEditingMode;
 
-  const GSCardCategory(this.course, this.category, this.courseKey, this.categoriesInCourse, this.isEditingMode, this.onSlide);
+  const GSCardCategory(this.course, this.category, this.courseKey, this.categoriesInCourse, this.isEditingMode, this.onExpanded);
 
   @override
   _GSCardCategoryState createState() => _GSCardCategoryState();
@@ -45,13 +45,13 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
                 if (worksSnapshot.hasData) {
                   works = worksSnapshot.data;
                 }
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Row(
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
                         children: <Widget>[
                           Expanded(
                             flex: 2,
@@ -106,19 +106,32 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
                           ),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 7.0),
-                        child: GSTrackCategory(widget.category),
-                      ),
-                      ShowWorks(
-                        course: widget.course,
-                        category: widget.category,
-                        works: works,
-                        categoriesInCourse: widget.categoriesInCourse,
-                      ),
-                      // GSTrackCategoryTitle(worksSnapshot.data),
-                    ],
-                  ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 7.0),
+                      child: GSTrackCategory(widget.category),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    StreamBuilder<List<Work>>(
+                        stream: db.streamWorks(widget.category.documentId),
+                        builder: (context, snapshot) {
+                          List<Work> workStories = [];
+                          if (snapshot.hasData) {
+                            workStories = snapshot.data;
+                          }
+                          return Container(
+                            height: 130,
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                              children: workStories.map((work) => WorkStory(work)).toList(),
+                            ),
+                          );
+                        })
+                    // GSTrackCategoryTitle(worksSnapshot.data),
+                  ],
                 );
               },
             ),

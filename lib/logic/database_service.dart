@@ -26,7 +26,7 @@ class DatabaseService {
     return doc.documentID;
   }
 
-  Future<String> addSampleCourse(FirebaseUser user) async {
+  Future<String> addSampleChemistryCourse(FirebaseUser user) async {
     DocumentReference courseDocument = await _coursesCollection.add({
       'title': "Chemistry II",
       'userId': user.uid,
@@ -52,6 +52,44 @@ class DatabaseService {
     addWork(homeworkKey, "ATP Homework", 8, 10);
     String finalKey = await addCategory(courseKey, categoryName: "Final Exam", weight: 0.25);
     addWork(finalKey, "Final Exam", 55, 60);
+    return courseDocument.documentID;
+  }
+
+  Future<String> addSampleMathCourse(FirebaseUser user) async {
+    DocumentReference courseDocument = await _coursesCollection.add({
+      'title': "Calculus",
+      'userId': user.uid,
+    });
+    String courseKey = courseDocument.documentID;
+    await Future.delayed(Duration(milliseconds: 200));
+    String examsKey = await addCategory(courseKey, categoryName: "Exams", weight: 0.5);
+    addWork(examsKey, "Limits Exam", 45, 50);
+    addWork(examsKey, "Derivatives Exam", 40, 60);
+    await Future.delayed(Duration(milliseconds: 400));
+    String quizzesKey = await addCategory(courseKey, categoryName: "Quizzes", weight: 0.1);
+    addWork(quizzesKey, "Limits Intro Quiz", 8, 10);
+    addWork(quizzesKey, "Estimating Limits From Graphs Quiz", 10, 10);
+    addWork(quizzesKey, "Properties of Limits Quiz", 10, 10);
+    addWork(quizzesKey, "Infinite Limits Quiz", 9, 10);
+    addWork(quizzesKey, "Removing Discontinuities Quiz", 10, 10);
+    addWork(quizzesKey, "Squeeze Theorem Quiz", 7, 10);
+    addWork(quizzesKey, "Strategy in Finding Limits Quiz", 10, 10);
+    addWork(quizzesKey, "Chain Rule Quiz", 10, 10);
+    addWork(quizzesKey, "Disguised Derivatives Quiz", 10, 10);
+    addWork(quizzesKey, "Proof Quiz", 10, 10);
+    await Future.delayed(Duration(milliseconds: 600));
+    String projectKey = await addCategory(courseKey, categoryName: "Projects", weight: 0.10);
+    addWork(projectKey, "Integrals Project", 24, 25);
+    String homeworkKey = await addCategory(courseKey, categoryName: "Homework", weight: 0.05);
+    addWork(homeworkKey, "Mean Value Theorem Homework", 4, 5);
+    addWork(homeworkKey, "Relative (local) Extrema Homework", 5, 5);
+    addWork(homeworkKey, "Absolute (global) Extrema Homework", 5, 2);
+    addWork(homeworkKey, "Concavity and Inflection Points Intro Homework", 8, 10);
+    addWork(homeworkKey, "Sketching Curves Homework", 9, 10);
+    addWork(homeworkKey, "Analyzing Implicit Relations Homework", 10, 10);
+    addWork(homeworkKey, "Calculator-Active Practice Homework", 8, 10);
+    String finalKey = await addCategory(courseKey, categoryName: "Final Exam", weight: 0.25);
+    addWork(finalKey, "Final Exam", 50, 60);
     return courseDocument.documentID;
   }
 

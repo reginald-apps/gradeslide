@@ -22,6 +22,7 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
   bool isSortMode;
   List<Course> courses;
   AnimationController _controller;
+  TrackingScrollController _scrollController;
   Animation _animation;
   Animation<Offset> _offsetAnimation;
 
@@ -30,6 +31,7 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
     isEditingMode = false;
     isSortMode = false;
     courses = [];
+    _scrollController = TrackingScrollController();
     _controller = AnimationController(duration: Duration(seconds: 3), vsync: this)..forward();
     _animation = new Tween<double>(begin: 0.0, end: 1.0).animate(new CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
     super.initState();
@@ -87,10 +89,13 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
           stream: db.streamCourses(user.uid),
           builder: (context, coursesSnapshot) {
             return FutureBuilder(
-                future: Future.delayed(Duration(milliseconds: 0)),
+                future: Future.delayed(Duration(milliseconds: 750)),
                 builder: (context, loadingScreenSnapshot) {
                   if (loadingScreenSnapshot.connectionState != ConnectionState.done) {
-                    return LoadingScreen("Loading Courses");
+                    return Center(
+                        child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                    ));
                   }
                   return coursesSnapshot.hasData && coursesSnapshot.data.length == 0
                       ? Center(
@@ -109,7 +114,10 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
                             SizedBox(
                               height: 10,
                             ),
-                            buildFirstCourseButton("Try Sample Course", 1, () => db.addSampleCourse(user)),
+                            buildFirstCourseButton("Try Sample Course", 1, () {
+                              db.addSampleChemistryCourse(user);
+                              db.addSampleMathCourse(user);
+                            }),
                             buildFirstCourseButton("Manually Enter Rubric", 2, () {}),
                             buildFirstCourseButton("Transfer Course via Course Code", 3, () {}),
                             SizedBox(
@@ -119,7 +127,8 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
                         ))
                       : !isEditingMode
                           ? ListView(
-                              //physics: AlwaysScrollableScrollPhysics(),
+                              physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                              controller: _scrollController,
                               children: coursesSnapshot.hasData
                                   ? coursesSnapshot.data
                                       .asMap()

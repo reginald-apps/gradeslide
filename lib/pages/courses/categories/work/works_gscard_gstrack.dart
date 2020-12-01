@@ -36,7 +36,7 @@ class _GSTrackWorkState extends State<GSTrackWork> with SingleTickerProviderStat
     var isDark = Theme.of(context).brightness == Brightness.dark;
     var work = widget.work;
     return Padding(
-      padding: EdgeInsets.only(left: widget.isSmaller ? 5 : 10.0, top: widget.isSmaller ? 5 : 10, bottom: widget.isSmaller ? 5 : 10, right: widget.isSmaller ? 5 : 10.0),
+      padding: EdgeInsets.only(left: widget.isSmaller ? 5 : 10.0, top: widget.isSmaller ? 5 : 5, bottom: widget.isSmaller ? 5 : 5, right: widget.isSmaller ? 5 : 10.0),
       child: LayoutBuilder(builder: (context, constraints) {
         double width = constraints.maxWidth;
         return AnimatedBuilder(
@@ -44,7 +44,7 @@ class _GSTrackWorkState extends State<GSTrackWork> with SingleTickerProviderStat
           builder: (BuildContext context, Widget child) {
             return Container(
               decoration: BoxDecoration(
-                  border: Border.all(width: widget.isSmaller ? 1 : 3, color: work.completed ? Colors.green[200] : Colors.orange[200]),
+                  border: Border.all(width: widget.isSmaller ? 1 : 3, color: work.completed ? Colors.green[300] : Colors.orange[200]),
                   borderRadius: BorderRadius.all(Radius.circular(15))),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),

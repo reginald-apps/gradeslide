@@ -47,6 +47,53 @@ class _GSCardWorkState extends State<GSCardWork> {
                     children: <Widget>[
                       Expanded(
                         flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 15.0),
+                          child: CircleAvatar(
+                            radius: 50,
+                            child: Center(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "${((widget.work.pointsEarned / widget.work.pointsMax) * 100).toInt()}%",
+                                    textScaleFactor: 1.5,
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(color: titleColor),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            backgroundColor: work.completed ? Colors.green : Colors.orangeAccent,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 6,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 0, top: 0.0),
+                          child: Column(
+                            children: [
+                              SizedBox(height: 15),
+                              Text(
+                                "${work.name}",
+                                textAlign: TextAlign.center,
+                                textScaleFactor: 1.20,
+                                style: TextStyle(decoration: TextDecoration.underline, color: titleColor, fontWeight: FontWeight.w900),
+                              ),
+                              Text(
+                                "Adjusted Weight: ${(GradeSlideMaths.getWorth(widget.works, widget.work) * widget.categoryWeight).toStringAsPrecision(2)}",
+                                style: TextStyle(color: titleColor.withOpacity(.65)),
+                                textAlign: TextAlign.center,
+                                textScaleFactor: .85,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
                         child: Align(
                           child: Stack(
                             children: [
@@ -59,15 +106,6 @@ class _GSCardWorkState extends State<GSCardWork> {
                                       Container(
                                         width: 40,
                                       ),
-                                      Container(
-                                        width: 30,
-                                        child: Text(
-                                          "#${widget.id + 1}",
-                                          style: TextStyle(color: Colors.white),
-                                          textScaleFactor: 1,
-                                          textAlign: TextAlign.left,
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -78,7 +116,7 @@ class _GSCardWorkState extends State<GSCardWork> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Padding(
-                                  padding: const EdgeInsets.only(top: 10.0, left: 7.5),
+                                  padding: const EdgeInsets.only(top: 9.0, left: 7),
                                   child: Transform.scale(
                                     scale: 1.5,
                                     child: Checkbox(
@@ -92,62 +130,6 @@ class _GSCardWorkState extends State<GSCardWork> {
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 6,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 0, top: 10.0),
-                          child: Column(
-                            children: [
-                              SizedBox(height: 15),
-                              Text(
-                                "${work.name}",
-                                textAlign: TextAlign.center,
-                                textScaleFactor: 1.20,
-                                style: TextStyle(decoration: TextDecoration.underline, color: titleColor, fontWeight: FontWeight.w900),
-                              ),
-                              Text(
-                                "Adjusted Weight: ${(GradeSlideMaths.getWorth(widget.works, widget.work) * widget.categoryWeight).toStringAsPrecision(2)}",
-                                style: TextStyle(color: titleColor.withOpacity(.85)),
-                                textAlign: TextAlign.center,
-                                textScaleFactor: .75,
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              width: 77.5,
-                              child: Card(
-                                margin: EdgeInsets.only(right: 10.5, top: 12.5),
-                                color: work.completed ? Colors.transparent : Colors.orange,
-                                elevation: 0,
-                                child: Center(
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        "${((widget.work.pointsEarned / widget.work.pointsMax) * 100).toInt()}%",
-                                        textScaleFactor: 1.75,
-                                        textAlign: TextAlign.right,
-                                        style: TextStyle(color: titleColor),
-                                      ),
-                                      Text(
-                                        "{${work.pointsEarned}/${work.pointsMax}}",
-                                        style: TextStyle(color: titleColor.withOpacity(.85)),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ],

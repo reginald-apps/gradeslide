@@ -39,7 +39,18 @@ class MyApp extends StatelessWidget {
                 }
                 return SignInScreen();
               } else {
-                return Scaffold(body: Center(child: CircularProgressIndicator()));
+                return Scaffold(
+                    body: Center(
+                        child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Welcome back!"),
+                    SizedBox(height: 10),
+                    CircularProgressIndicator(
+                      strokeWidth: 5,
+                    ),
+                  ],
+                )));
               }
             }),
         debugShowCheckedModeBanner: false,
