@@ -1,0 +1,10 @@
+/*
+/*/
+!lib/
+!images/
+!fonts/
+!flares/
+!pubspec.yaml
+!build.gradle
+!build.gradles
+!.gitignore
