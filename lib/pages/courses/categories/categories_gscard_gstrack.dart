@@ -1,6 +1,5 @@
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
 import 'package:gradeslide/logic/gsmaths.dart';
@@ -8,8 +7,11 @@ import 'package:provider/provider.dart';
 
 class GSTrackCategory extends StatefulWidget {
   final Category category;
+  final bool startAnimated;
+  final Function(List<Work>) getPoints;
+  final bool isOverview;
 
-  GSTrackCategory(this.category);
+  GSTrackCategory(this.category, this.startAnimated, this.getPoints, this.isOverview);
 
   @override
   _GSTrackCategoryState createState() => _GSTrackCategoryState();
@@ -21,8 +23,8 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
 
   @override
   void initState() {
-    _controller = AnimationController(duration: Duration(milliseconds: 1000), vsync: this);
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.elasticOut);
+    _controller = AnimationController(duration: Duration(milliseconds: widget.startAnimated ? 1000 : 1000), vsync: this);
+    _animation = CurvedAnimation(parent: _controller, curve: widget.startAnimated ? Curves.elasticOut : Curves.fastOutSlowIn);
     _controller.forward();
     super.initState();
   }
@@ -37,8 +39,7 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
   Widget build(BuildContext context) {
     DatabaseService db = Provider.of<DatabaseService>(context);
     Category category = widget.category;
-    double height = 15; //TODO: iPhone: 15, Tablet: 22
-    double goalSize = 1.5;
+    double trackHeight = widget.isOverview ? 8 : 15; //TODO: iPhone: 15, Tablet: 22
     return AnimatedBuilder(
         builder: (context, _) {
           return StreamBuilder<List<Work>>(
@@ -48,23 +49,23 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
                     ? LayoutBuilder(builder: (context, constraints) {
                         double trackLength = constraints.maxWidth * _animation.value;
                         double completedStart = 0;
-                        double completedWidth = category.weight * trackLength * GradeSlideMaths.getCategoryCompletedGrade(snapshot.data, false);
-
-                        double targetStart = 0;
-                        double targetWidth = category.weight * trackLength * GradeSlideMaths.getCategoryTargetGrade(snapshot.data);
-
-                        double maximumWidth = (1 - GradeSlideMaths.getCategoryMaximumTargetGrade(snapshot.data)) * trackLength * category.weight;
-
-                        double progressStart = 0;
-                        double progressEnd = category.weight * trackLength;
-
+                        double completedWidth = category.weight * trackLength * GradeSlideMaths.getCategoryCompletedGrade(snapshot.data, false)[0];
+                        double targetWidth = category.weight * trackLength * GradeSlideMaths.getCategoryTargetGrade(snapshot.data)[0];
+                        double maximumWidth = (1 - GradeSlideMaths.getCategoryMaximumTargetGrade(snapshot.data)[0]) * trackLength * category.weight;
                         double animationProgress = _animation.value;
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          //widget.getPoints.call(snapshot.data);
+                          //print(snapshot.data);
+                        }
                         return ClipRRect(
-                          borderRadius: BorderRadius.circular(15.0),
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
                           child: Stack(
+                            alignment: Alignment.center,
+                            overflow: Overflow.visible,
                             children: <Widget>[
                               Container(
                                 width: trackLength * category.weight,
+                                height: trackHeight,
                                 foregroundDecoration: Theme.of(context).brightness == Brightness.dark
                                     ? BoxDecoration(
                                         border: Border.all(width: 2.5, color: Colors.white.withOpacity(.25)), borderRadius: BorderRadius.all(Radius.circular(15)))
@@ -80,7 +81,7 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
                                         duration: Duration(milliseconds: 500),
                                         curve: Curves.bounceOut,
                                         color: Colors.black.withOpacity(.10),
-                                        height: height,
+                                        height: trackHeight,
                                         width: trackLength,
                                         child: Container(),
                                       ),
@@ -95,7 +96,7 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
                                           animation: "Progress",
                                         ),
                                       ),
-                                      height: height,
+                                      height: trackHeight,
                                       width: trackLength,
                                     ),
                                     Positioned(
@@ -104,7 +105,7 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
                                         color: Colors.green,
                                         duration: Duration(milliseconds: 250),
                                         curve: Curves.ease,
-                                        height: height,
+                                        height: trackHeight,
                                         width: completedWidth * animationProgress,
                                       ),
                                     ),
@@ -114,17 +115,41 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
                                         duration: Duration(milliseconds: 250),
                                         curve: Curves.ease,
                                         color: Colors.red,
-                                        height: height,
+                                        height: trackHeight,
                                         width: (maximumWidth * animationProgress),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ), /*
+                              ),
+                              /*
                               Positioned(
                                 left: targetStart - 4 + targetWidth * animationProgress,
                                 child: AnimatedContainer(duration: Duration(seconds: 1), child: GSTrackCategoryMarker(0.0, height + 2)),
                               ),*/
+                              Positioned(
+                                left: -2,
+                                child: Row(
+                                  children: [
+                                    AnimatedContainer(
+                                      duration: Duration(milliseconds: 250),
+                                      curve: Curves.ease,
+                                      color: Colors.transparent,
+                                      height: trackHeight,
+                                      width: animationProgress * targetWidth,
+                                    ),
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: trackHeight,
+                                          width: 2,
+                                          color: Colors.white.withOpacity(.5),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         );
@@ -140,8 +165,8 @@ class _GSTrackCategoryState extends State<GSTrackCategory> with SingleTickerProv
                                 children: <Widget>[
                                   Positioned(
                                     child: Container(
-                                      color: Colors.black.withOpacity(.10),
-                                      height: 20,
+                                      color: Colors.black.withOpacity(.05),
+                                      height: 0,
                                       width: width,
                                     ),
                                   ),

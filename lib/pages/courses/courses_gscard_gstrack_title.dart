@@ -3,10 +3,28 @@ import 'package:flutter/material.dart';
 
 class GSTrackCourseTitle extends StatefulWidget {
   final double grade;
+  final double gradePointsEarned;
+  final double gradePointsMax;
   final double target;
+  final double targetPointsEarned;
+  final double targetPointsMax;
   final double max;
+  final double maxPointsEarned;
+  final double maxPointsMax;
+  final bool isOverview;
 
-  GSTrackCourseTitle({this.grade, this.target, this.max});
+  GSTrackCourseTitle({
+    this.grade,
+    this.gradePointsEarned,
+    this.gradePointsMax,
+    this.target,
+    this.targetPointsEarned,
+    this.targetPointsMax,
+    this.max,
+    this.maxPointsEarned,
+    this.maxPointsMax,
+    this.isOverview = false,
+  });
 
   @override
   _GSTrackCourseTitleState createState() => _GSTrackCourseTitleState();
@@ -46,30 +64,64 @@ class _GSTrackCourseTitleState extends State<GSTrackCourseTitle> with SingleTick
 
   @override
   Widget build(BuildContext context) {
+    bool isOverview = widget.isOverview;
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, _) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(child: _buildTitle("Current:", Colors.green, widget.grade, TextAlign.start, _scaleAnimation, _gradeChanging)),
-            Expanded(child: _buildTitle("Target:", Colors.amber, widget.target, TextAlign.center, _scaleAnimation, _targetChanging)),
-            Expanded(child: _buildTitle("Max:", Colors.red, widget.max, TextAlign.end, _scaleAnimation, _maxChanging)),
+            Expanded(
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: _buildTitle(
+                      "Current:", Colors.green, widget.grade, widget.gradePointsEarned, widget.gradePointsMax, TextAlign.start, _scaleAnimation, _gradeChanging)),
+            ),
+            Expanded(
+              child: Align(
+                  alignment: Alignment.center,
+                  child: _buildTitle(
+                      "Goal:", Colors.amber, widget.target, widget.targetPointsEarned, widget.targetPointsMax, TextAlign.center, _scaleAnimation, _targetChanging)),
+            ),
+            Expanded(
+              child: Align(
+                  alignment: Alignment.centerRight,
+                  child: _buildTitle("Max:", Colors.red, widget.max, widget.maxPointsEarned, widget.maxPointsMax, TextAlign.end, _scaleAnimation, _maxChanging)),
+            ),
           ],
         );
       },
     );
   }
 
-  Widget _buildTitle(String title, Color titleColor, double value, TextAlign alignment, Animation animation, bool changing) {
+  Widget _buildTitle(String title, Color titleColor, double value, double pointsEarned, double pointsMax, TextAlign alignment, Animation animation, bool changing) {
     return Transform.scale(
       scale: changing ? (_scaleAnimation.value / 8) + 1.0 : 1,
       child: Container(
-        child: Text(
-          "$title\n${(value * 100).truncate()}%",
-          style: TextStyle(color: titleColor, shadows: [Shadow(color: titleColor, blurRadius: changing ? _scaleAnimation.value * 3 : 2)], fontSize: 18),
-          textAlign: alignment,
-          //textScaleFactor: 1.25,
+        child: Column(
+          children: [
+            RichText(
+              textAlign: alignment,
+              text: TextSpan(
+                  text: '$title',
+                  style: TextStyle(
+                    color: titleColor,
+                    fontFamily: "Montserrat-Bold",
+                    fontSize: widget.isOverview ? 10 : 18,
+                    shadows: [Shadow(color: titleColor, blurRadius: changing ? _scaleAnimation.value * 3 : 2)],
+                  ),
+                  children: <TextSpan>[
+                    TextSpan(
+                        text: '\n${(value * 100).truncate()}%',
+                        style: TextStyle(
+                          color: titleColor,
+                          fontFamily: "Montserrat-Bold",
+                          fontSize: widget.isOverview ? 10 : 18,
+                          shadows: [Shadow(color: titleColor, blurRadius: changing ? _scaleAnimation.value * 3 : 2)],
+                        )),
+                  ]),
+            ),
+          ],
         ),
       ),
     );

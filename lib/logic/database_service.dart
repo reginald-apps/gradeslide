@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'gsmaths.dart';
 
 class DatabaseService {
   final _coursesCollection = Firestore.instance.collection('courses');
@@ -12,6 +11,7 @@ class DatabaseService {
   //===========================================COURSE============================================//
 
   Stream<List<Course>> streamCourses(String userId) async* {
+    //print(userId);
     var ref = _coursesCollection.where("userId", isEqualTo: userId);
     yield* ref.snapshots().map((list) => list.documents.map((courseDocument) {
           return Course.fromJson(courseDocument.documentID, courseDocument.data);
@@ -93,6 +93,29 @@ class DatabaseService {
     return courseDocument.documentID;
   }
 
+  Future<String> addAndrewCourse(FirebaseUser user) async {
+    DocumentReference courseDocument = await _coursesCollection.add({
+      'title': "Engineering",
+      'userId': user.uid,
+    });
+    String courseKey = courseDocument.documentID;
+    await Future.delayed(Duration(milliseconds: 200));
+    String examsKey = await addCategory(courseKey, categoryName: "Quizzes", weight: 0.1);
+    addWork(examsKey, "Limits Exam", 57, 100);
+    await Future.delayed(Duration(milliseconds: 400));
+    String quizzesKey = await addCategory(courseKey, categoryName: "Classwork", weight: 0.05);
+    addWork(quizzesKey, "Limits Intro Quiz", 93, 100);
+    await Future.delayed(Duration(milliseconds: 600));
+    String projectKey = await addCategory(courseKey, categoryName: "Homework", weight: 0.1);
+    addWork(projectKey, "Integrals Project", 54, 100);
+    String homeworkKey = await addCategory(courseKey, categoryName: "Tests", weight: 0.50);
+    addWork(homeworkKey, "Mean Value Theorem Homework", 90, 100);
+    addWork(homeworkKey, "Relative (local) Extrema Homework", 63, 100);
+    String finalKey = await addCategory(courseKey, categoryName: "Final Exam", weight: 0.25);
+    addWork(finalKey, "Final Exam", 90, 100);
+    return courseDocument.documentID;
+  }
+
   Future<bool> updateCourseSorts(String courseKey, bool isIndicies, bool isAZ, bool isWeights) async {
     await _coursesCollection.document(courseKey).updateData({
       "sorts": [isIndicies, isAZ, isWeights]
@@ -109,6 +132,11 @@ class DatabaseService {
 
   Future<bool> updateCourseIsShowMore(String courseKey, bool showMore) async {
     await _coursesCollection.document(courseKey).updateData({"isShowMore": showMore});
+    return true;
+  }
+
+  Future<bool> updateCourseCGM(String courseKey, double current, double goal, double max) async {
+    await _coursesCollection.document(courseKey).updateData({"current": current, "goal": goal, "max": max});
     return true;
   }
 
@@ -168,6 +196,7 @@ class DatabaseService {
   }
 
   //============================================WORKS=============================================//
+
   Stream<List<Work>> streamWorks(String categoryKey) {
     var ref = _worksCollection.where("categoryKey", isEqualTo: categoryKey);
     return ref.snapshots().map((list) => list.documents.map((workDocument) {
@@ -187,6 +216,13 @@ class DatabaseService {
   Future<bool> deleteWork(String workKey) async {
     await _worksCollection.document(workKey).delete();
     return true;
+  }
+
+  Stream<Work> getWork(String workKey) {
+    var workRef = _worksCollection.document(workKey);
+    return workRef.snapshots().map((doc) {
+      return Work.fromJson(workKey, doc.data);
+    });
   }
 
   Future<bool> setWorkIndex(String workKey, int index) async {

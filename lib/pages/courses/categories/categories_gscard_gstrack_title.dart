@@ -24,7 +24,7 @@ class GSTrackCategoryTitle extends StatelessWidget {
                   textScaleFactor: .65,
                 ),
                 Text(
-                  "${(GradeSlideMaths.getCategoryCompletedGrade(works, false) * 100).round()}%",
+                  "${(GradeSlideMaths.getCategoryCompletedGrade(works, false)[0] * 100).round()}%",
                   style: TextStyle(color: Colors.green),
                   textScaleFactor: .65,
                 ),
@@ -42,7 +42,7 @@ class GSTrackCategoryTitle extends StatelessWidget {
                   textScaleFactor: .65,
                 ),
                 Text(
-                  "${(GradeSlideMaths.getCategoryTargetGrade(works) * 100).round()}%",
+                  "${(GradeSlideMaths.getCategoryTargetGrade(works)[0] * 100).round()}%",
                   style: TextStyle(color: Colors.orange),
                   textScaleFactor: .65,
                 ),
@@ -58,7 +58,7 @@ class GSTrackCategoryTitle extends StatelessWidget {
                   textScaleFactor: .65,
                 ),
                 Text(
-                  "${(GradeSlideMaths.getCategoryMaximumTargetGrade(works) * 100).round()}%",
+                  "${(GradeSlideMaths.getCategoryMaximumTargetGrade(works)[0] * 100).round()}%",
                   style: TextStyle(color: Colors.red),
                   textScaleFactor: .65,
                 ),

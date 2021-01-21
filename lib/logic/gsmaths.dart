@@ -71,10 +71,10 @@ class GradeSlideMaths {
     return courseMaximum;
   }
 
-  static double getCategoryCompletedGrade(List<Work> works, bool courseBar) {
+  static List<dynamic> getCategoryCompletedGrade(List<Work> works, bool courseBar) {
     bool allIncomplete = true;
     if (works.isEmpty) {
-      return 0.0;
+      return [0.0, 0, 0];
     }
     int totalPointsEarned = 0;
     int totalPointsMax = 0;
@@ -86,18 +86,17 @@ class GradeSlideMaths {
       }
     }
     if (allIncomplete && courseBar) {
-      return 1.0;
+      return [1.0, totalPointsEarned, totalPointsMax];
     }
     if (totalPointsMax == 0) {
-      return 0.0;
+      return [0.0, totalPointsEarned, totalPointsMax];
     }
-
-    return (totalPointsEarned / totalPointsMax);
+    return [(totalPointsEarned / totalPointsMax), totalPointsEarned, totalPointsMax];
   }
 
-  static double getCategoryTargetGrade(List<Work> works) {
+  static List<dynamic> getCategoryTargetGrade(List<Work> works) {
     if (works.isEmpty) {
-      return 0.0;
+      return [0.0, 0, 0];
     }
     int totalPointsEarned = 0;
     int totalPointsMax = 0;
@@ -106,14 +105,14 @@ class GradeSlideMaths {
       totalPointsMax += work.pointsMax;
     }
     if (totalPointsMax == 0) {
-      return 0.0;
+      return [0.0, totalPointsEarned, totalPointsMax];
     }
-    return (totalPointsEarned / totalPointsMax);
+    return [(totalPointsEarned / totalPointsMax), totalPointsEarned, totalPointsMax];
   }
 
-  static double getCategoryMaximumTargetGrade(List<Work> works) {
+  static List<dynamic> getCategoryMaximumTargetGrade(List<Work> works) {
     if (works.isEmpty) {
-      return 1.0;
+      return [1.0, 0, 0];
     }
     int totalPointsEarned = 0;
     int totalPointsMax = 0;
@@ -127,9 +126,9 @@ class GradeSlideMaths {
       }
     }
     if (totalPointsMax == 0) {
-      return 0.0;
+      return [0.0, totalPointsEarned, totalPointsMax];
     }
-    return (totalPointsEarned / totalPointsMax);
+    return [(totalPointsEarned / totalPointsMax), totalPointsEarned, totalPointsMax];
   }
 
   static double getCategoryMaximumTargetGradePerWork(Work work) {

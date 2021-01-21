@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
 import 'package:gradeslide/pages/courses/categories/categories_gscard_gstrack.dart';
-import 'package:gradeslide/pages/courses/categories/categories_gscard_showwords.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_gsstory.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_page.dart';
 import 'package:provider/provider.dart';
@@ -14,10 +14,10 @@ class GSCardCategory extends StatefulWidget {
   final String courseKey;
   final List<Category> categoriesInCourse;
   final Category category;
-  final Function(Category) onExpanded;
+  final Function() onPickerChanged;
   final bool isEditingMode;
 
-  const GSCardCategory(this.course, this.category, this.courseKey, this.categoriesInCourse, this.isEditingMode, this.onExpanded);
+  const GSCardCategory(this.course, this.category, this.courseKey, this.categoriesInCourse, this.isEditingMode, this.onPickerChanged);
 
   @override
   _GSCardCategoryState createState() => _GSCardCategoryState();
@@ -52,36 +52,52 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
-                        children: <Widget>[
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
                           Expanded(
-                            flex: 2,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: Text(
-                                widget.category.name,
-                                textScaleFactor: 1.50,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.bodyText1,
-                              ),
-                            ),
-                          ),
+                              flex: 3,
+                              child: Row(
+                                children: [
+                                  Text(widget.category.name, style: Theme.of(context).textTheme.bodyText1, textScaleFactor: 1.50), //iPhone 1.5,
+                                  Expanded(
+                                    child: Divider(
+                                      thickness: 1,
+                                      color: Colors.grey.withOpacity(0),
+                                      indent: 5,
+                                      endIndent: 0,
+                                    ),
+                                  ),
+                                ],
+                              )),
                           Expanded(
                             flex: 1,
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                  children: [TextSpan(text: "${(widget.category.weight).toStringAsPrecision(2)}", style: TextStyle(fontWeight: FontWeight.w900))],
-                                  style: Theme.of(context).textTheme.bodyText1),
-                              textScaleFactor: 1.25,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "${(widget.category.weight * 100).truncate()}%",
+                                  style: Theme.of(context).textTheme.bodyText1, textScaleFactor: 1.50, //iPhone 1.5
+                                )
+                              ],
                             ),
                           ),
                           Expanded(
-                            flex: 2,
+                            flex: 3,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Divider(
+                                    thickness: 1,
+                                    color: Colors.grey.withOpacity(0),
+                                    indent: 0,
+                                    endIndent: 10,
+                                  ),
+                                ),
                                 Row(
-                                  children: <Widget>[
+                                  children: [
                                     FutureBuilder<int>(
                                         future: db.getTotalWorks(widget.category.documentId),
                                         builder: (context, snapshot) {
@@ -95,10 +111,7 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
                                             ],
                                           );
                                         }),
-                                    Icon(
-                                      Icons.arrow_forward_ios,
-                                      color: Colors.grey.withOpacity(.5),
-                                    )
+                                    Opacity(opacity: .35, child: Icon(Icons.arrow_forward_ios_rounded)),
                                   ],
                                 ),
                               ],
@@ -107,10 +120,7 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 7.0),
-                      child: GSTrackCategory(widget.category),
-                    ),
+                    GSTrackCategory(widget.category, true, (val) => {}, false),
                     SizedBox(
                       height: 10,
                     ),
@@ -121,33 +131,40 @@ class _GSCardCategoryState extends State<GSCardCategory> with SingleTickerProvid
                           if (snapshot.hasData) {
                             workStories = snapshot.data;
                           }
-                          return Container(
-                            height: 130,
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                              children: workStories.map((work) => WorkStory(work)).toList(),
-                            ),
+                          return Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 20,
+                            runSpacing: 5,
+                            children: workStories.map((work) => WorkStory(work)).toList(),
                           );
-                        })
-                    // GSTrackCategoryTitle(worksSnapshot.data),
+                        }),
+                    SizedBox(
+                      height: 10,
+                    ),
                   ],
                 );
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Container(
-              height: 1,
-              color: Theme.of(context).dividerColor,
-            ),
-          )
+          Container(
+            height: 1,
+            color: Theme.of(context).dividerColor,
+          ),
         ],
       ),
       onPressed: () {
-        //Scaffold.of(context).showBottomSheet((context) => WorksPage(widget.course, widget.category, widget.categoriesInCourse));
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => WorksPage(widget.course, widget.category, widget.categoriesInCourse, 0)));
+        Scaffold.of(context).showBottomSheet(
+          (context) => Padding(
+            padding: const EdgeInsets.only(top: 6.0, left: 6.0, right: 6.0),
+            child: ClipRRect(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                child: WorksPage(widget.course, widget.category, widget.categoriesInCourse, 0, widget.onPickerChanged, null, 0)),
+          ),
+          elevation: 10,
+          backgroundColor: Colors.transparent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))),
+        );
+        //Navigator.of(context).push(MaterialPageRoute(builder: (context) => WorksPage(widget.course, widget.category, widget.categoriesInCourse, 0)));
       },
     );
   }

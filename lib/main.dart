@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         Provider.value(value: AuthService()),
       ],
       child: MaterialApp(
-        themeMode: ThemeMode.dark,
+        themeMode: ThemeMode.light,
         darkTheme: GSConstants.darkMode(Colors.blue),
         theme: GSConstants.defaultTheme(Colors.blue),
         home: FutureBuilder(
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
                         child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Welcome back!"),
+                    //Text("Welcome back!"),
                     SizedBox(height: 10),
                     CircularProgressIndicator(
                       strokeWidth: 5,

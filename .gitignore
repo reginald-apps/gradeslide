@@ -5,6 +5,5 @@
 !fonts/
 !flares/
 !pubspec.yaml
-!build.gradle
-!build.gradles
+!android/app/build.gradle/
 !.gitignore

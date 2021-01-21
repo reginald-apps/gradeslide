@@ -27,6 +27,9 @@ Course _$CourseFromJson(String documentId, Map<String, dynamic> json) {
     index: json['index'] as int ?? -1,
     title: json['title'] as String ?? "UNTITLED COURSE",
     credits: json['credits'] as int ?? 3,
+    current: json['current'] as double ?? 0,
+    goal: json['current'] as double ?? 0,
+    max: json['current'] as double ?? 0,
     totalPoints: json['totalPoints'] as int ?? 1000,
     isShowMore: json['isShowMore'] as bool ?? false,
     sorts: (json['sorts'] as List)

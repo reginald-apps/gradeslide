@@ -86,7 +86,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
               return Scaffold(
                   // drawer: Drawer(child: SettingsPage()),
                   appBar: AppBar(
-                    toolbarHeight: 200.0,
+                    toolbarHeight: 175.0,
                     title: GestureDetector(
                       child: Text(
                         widget.course.title ?? "?",
@@ -117,7 +117,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                     bottom: PreferredSize(
                       child: Column(
                         children: <Widget>[
-                          GSTrackCourse(widget.course),
+                          GSTrackCourse(course: widget.course, animatedStart: false),
                           SizedBox(
                             height: 10,
                           ),
@@ -131,7 +131,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                                     child: Text(
                                       "Rubric",
                                       style: TextStyle(color: Colors.white),
-                                      textScaleFactor: 3,
+                                      textScaleFactor: 2.25,
                                     ),
                                   ),
                                   totalWeight < 1 && categoriesInCourse.isNotEmpty && weightRemaining > 0
@@ -150,9 +150,6 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                               ),
                             ),
                           ),
-                          SizedBox(
-                            height: 10,
-                          ),
                         ],
                       ),
                       preferredSize: Size(0, 0),
@@ -168,7 +165,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                             color: Theme.of(context).cardColor,
                             height: 40,
                             child: Padding(
-                              padding: const EdgeInsets.only(top: 5, bottom: 5, left: 20, right: 20),
+                              padding: const EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
                               child: Row(
                                 children: [
                                   Expanded(
@@ -179,7 +176,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                                   )),
                                   Expanded(
                                       child: Text(
-                                    "Weight",
+                                    "Worth",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(fontWeight: FontWeight.w900, color: Colors.grey.withOpacity(.5)),
                                   )),
@@ -202,10 +199,10 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
                               controller: _trackingScrollController,
                               child: ListView.builder(
                                 controller: _trackingScrollController,
-                                physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                                physics: AlwaysScrollableScrollPhysics(),
                                 itemCount: categoriesInCourse.length,
                                 itemBuilder: (context, i) {
-                                  return GSCardCategory(widget.course, categoriesInCourse[i], widget.course.documentId, categoriesInCourse, isEditingMode, (value) {
+                                  return GSCardCategory(widget.course, categoriesInCourse[i], widget.course.documentId, categoriesInCourse, isEditingMode, () {
                                     setState(() {});
                                   });
                                 },

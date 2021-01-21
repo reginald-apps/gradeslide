@@ -71,7 +71,6 @@ class GSConstants {
         centerTitle: true,
         elevation: 0.0,
         iconTheme: IconThemeData(color: Colors.grey),
-        textTheme: TextTheme(headline6: TextStyle(color: Colors.white)),
       ),
       buttonTheme: ButtonThemeData(
         buttonColor: favColor,

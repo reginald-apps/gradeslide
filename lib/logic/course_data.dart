@@ -24,6 +24,9 @@ class Course {
   int index;
   int totalPoints;
   String title;
+  double current;
+  double goal;
+  double max;
   bool isShowMore;
   int credits;
   List<bool> sorts;
@@ -37,6 +40,9 @@ class Course {
       this.index,
       this.title = "",
       this.credits = 3,
+      this.current = 0,
+      this.goal = 0,
+      this.max = 0,
       this.totalPoints = 1000,
       this.sorts,
       this.categoryList,
@@ -90,6 +96,6 @@ class Work {
 
   @override
   String toString() {
-    return name;
+    return ("($completed").toString();
   }
 }

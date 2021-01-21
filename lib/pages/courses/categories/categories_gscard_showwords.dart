@@ -176,8 +176,8 @@ class _ShowWorksState extends State<ShowWorks> with SingleTickerProviderStateMix
                             .entries
                             .map((e) => InkWell(
                                   onTap: () {
-                                    Navigator.of(context)
-                                        .push(MaterialPageRoute(builder: (context) => WorksPage(widget.course, widget.category, widget.categoriesInCourse, e.key)));
+                                    //  Navigator.of(context)
+                                    //      .push(MaterialPageRoute(builder: (context) => WorksPage(widget.course, widget.category, widget.categoriesInCourse, e.key)));
                                   },
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.stretch,

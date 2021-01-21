@@ -20,6 +20,7 @@ dependencies:
   flare_flutter: any
   lit_firebase_auth: ^0.2.3
   material_design_icons_flutter: 4.0.5655
+  flutter_multi_carousel: ^1.0.3
 
 
 

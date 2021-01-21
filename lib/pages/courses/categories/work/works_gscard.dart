@@ -1,11 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
-import 'package:gradeslide/logic/gsmaths.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_gscard_gspicker.dart';
-import 'package:gradeslide/pages/courses/categories/work/works_gscard_gstrack.dart';
 import 'package:provider/provider.dart';
 
 class GSCardWork extends StatefulWidget {
@@ -14,8 +13,9 @@ class GSCardWork extends StatefulWidget {
   final List<Work> works;
   final double categoryWeight;
   final bool isEditingMode;
+  final Function onPickerChanged;
 
-  GSCardWork(this.id, this.work, this.works, this.categoryWeight, this.isEditingMode);
+  GSCardWork({this.id, this.work, this.works, this.categoryWeight, this.isEditingMode, this.onPickerChanged});
 
   @override
   _GSCardWorkState createState() => _GSCardWorkState();
@@ -44,103 +44,101 @@ class _GSCardWorkState extends State<GSCardWork> {
               children: <Widget>[
                 SafeArea(
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Expanded(
-                        flex: 2,
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 15.0),
-                          child: CircleAvatar(
-                            radius: 50,
-                            child: Center(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "${((widget.work.pointsEarned / widget.work.pointsMax) * 100).toInt()}%",
-                                    textScaleFactor: 1.5,
-                                    textAlign: TextAlign.right,
-                                    style: TextStyle(color: titleColor),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            backgroundColor: work.completed ? Colors.green : Colors.orangeAccent,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 6,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 0, top: 0.0),
-                          child: Column(
+                          padding: const EdgeInsets.only(left: 15.0, bottom: 5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SizedBox(height: 15),
-                              Text(
-                                "${work.name}",
-                                textAlign: TextAlign.center,
-                                textScaleFactor: 1.20,
-                                style: TextStyle(decoration: TextDecoration.underline, color: titleColor, fontWeight: FontWeight.w900),
+                              Expanded(
+                                flex: 4,
+                                child: Text(
+                                  "${work.name}",
+                                  textAlign: TextAlign.left,
+                                  textScaleFactor: 1.35,
+                                  overflow: TextOverflow.clip,
+                                  style: TextStyle(color: titleColor, fontWeight: FontWeight.w900),
+                                ),
                               ),
-                              Text(
-                                "Adjusted Weight: ${(GradeSlideMaths.getWorth(widget.works, widget.work) * widget.categoryWeight).toStringAsPrecision(2)}",
-                                style: TextStyle(color: titleColor.withOpacity(.65)),
-                                textAlign: TextAlign.center,
-                                textScaleFactor: .85,
-                              )
                             ],
                           ),
                         ),
                       ),
-                      Expanded(
-                        flex: 2,
-                        child: Align(
-                          child: Stack(
-                            children: [
-                              Card(
-                                child: Container(
-                                  height: 40,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        width: 40,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                color: work.completed ? Colors.transparent : Colors.orange,
-                                margin: EdgeInsets.only(left: 10.5, top: 12.5),
-                                elevation: 0,
-                              ),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 9.0, left: 7),
-                                  child: Transform.scale(
-                                    scale: 1.5,
-                                    child: Checkbox(
-                                      value: work.completed,
-                                      onChanged: (bool) {
-                                        db.setWorkCompleted(widget.work.documentId, bool);
-                                      },
+                      SizedBox(
+                        height: 175,
+                        width: 175,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              db.setWorkCompleted(widget.work.documentId, !widget.work.completed);
+                              widget.onPickerChanged.call();
+                            },
+                            child: Stack(
+                              children: [
+                                Center(
+                                  child: CircleAvatar(
+                                    radius: 60,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(height: 15),
+                                        Text(
+                                          "${work.completed ? "Your grade:" : "Your goal:"}",
+                                          textScaleFactor: .5,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(color: titleColor.withOpacity(.5)),
+                                        ),
+                                        Text(
+                                          "${((widget.work.pointsEarned / widget.work.pointsMax) * 100).toInt()}%",
+                                          textScaleFactor: 1.95,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(color: titleColor),
+                                        ),
+                                        Text(
+                                          "${work.pointsEarned}/${work.pointsMax}",
+                                          style: TextStyle(color: Colors.white.withOpacity(.5)),
+                                          textScaleFactor: 1,
+                                        ),
+                                        work.completed && work.pointsMax - work.pointsEarned > 0
+                                            ? Text(
+                                                "-${work.pointsMax - work.pointsEarned} points",
+                                                style: TextStyle(color: Colors.red.withOpacity(.5)),
+                                                textScaleFactor: .55,
+                                              )
+                                            : Text(
+                                                "",
+                                                style: TextStyle(color: Colors.red.withOpacity(.5)),
+                                                textScaleFactor: .55,
+                                              )
+                                      ],
                                     ),
+                                    backgroundColor: work.completed ? Colors.green : Colors.orange[500],
                                   ),
                                 ),
-                              ),
-                            ],
+                                Center(
+                                  child: SizedBox(
+                                    width: 120,
+                                    height: 120,
+                                    child: CustomPaint(painter: WorkCircleProgress(work.pointsEarned / work.pointsMax, work.completed)),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                GSTrackWork(widget.work, widget.isEditingMode, false),
+                //GSTrackWork(widget.work, widget.isEditingMode, false),
               ],
             ),
-          ),
-          SizedBox(
-            height: 10,
           ),
           Opacity(
             opacity: .30,
@@ -151,18 +149,60 @@ class _GSCardWorkState extends State<GSCardWork> {
             ),
           ),
           SafeArea(
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 250),
-              color: work.completed ? Colors.green[600] : Colors.orange[600],
-              curve: work.completed ? Curves.fastOutSlowIn : Curves.easeOut,
-              height: work.completed ? 0 : 75,
-              child: GSPickerWork(
-                work: widget.work,
-              ),
+            child: Stack(
+              children: [
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 250),
+                  color: work.completed ? Colors.green[600] : Colors.orange[700],
+                  curve: work.completed ? Curves.fastOutSlowIn : Curves.easeOut,
+                  height: work.completed ? 0 : 75,
+                  child: GSPickerWork(
+                    work: widget.work,
+                    onPickerChanged: widget.onPickerChanged,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+class WorkCircleProgress extends CustomPainter {
+  double currentProgress;
+  bool isCompleted;
+
+  WorkCircleProgress(this.currentProgress, this.isCompleted);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    //this is base circle
+    Paint outerCircle = Paint()
+      ..strokeWidth = 4
+      ..color = isCompleted ? Colors.green.withOpacity(.25) : Colors.orangeAccent.withOpacity(.75)
+      ..style = PaintingStyle.stroke;
+
+    Paint completeArc = Paint()
+      ..strokeWidth = 5
+      ..color = isCompleted ? Colors.green : Colors.orange
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    Offset center = Offset(size.width / 2, size.height / 2);
+    double radius = min(size.width / 2, size.height / 2) + 4;
+
+    canvas.drawCircle(center, radius, outerCircle); // this draws main outer circle
+
+    double angle = 2 * pi * (currentProgress);
+
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -pi / 2, angle, false, completeArc);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    // TODO: implement shouldRepaint
+    return true;
   }
 }

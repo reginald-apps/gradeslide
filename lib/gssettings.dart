@@ -31,26 +31,10 @@ class SettingsPage extends StatelessWidget {
         children: <Widget>[
           buildHeader(context, "Features"),
           ListTile(
-            leading: Icon(Icons.view_compact_rounded),
-            title: Text("Compact Mode"),
+            leading: Icon(Icons.search),
+            title: Text("Search Bar"),
             trailing: Switch(
               value: true,
-              onChanged: (value) {},
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.pin_drop_sharp),
-            title: Text("Progress Marker"),
-            trailing: Switch(
-              value: false,
-              onChanged: (value) {},
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.zoom_out_map),
-            title: Text("Track Zoom"),
-            trailing: Switch(
-              value: false,
               onChanged: (value) {},
             ),
           ),

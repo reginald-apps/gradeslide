@@ -90,7 +90,7 @@ class _SignInScreenState extends State<SignInScreen> with SingleTickerProviderSt
                                     loadingStates[2] = false;
                                   });
                                 }, loadingStates[1]),
-                                widgetizeIcon(null, "Continue Anonymously", Colors.white, Colors.amber, () async {
+                                widgetizeIcon(null, "Anonymous Sign-In", Colors.amber, Colors.blue, () async {
                                   try {
                                     setState(() {
                                       loadingStates[0] = false;
@@ -144,6 +144,7 @@ class _SignInScreenState extends State<SignInScreen> with SingleTickerProviderSt
               child: loading
                   ? Center(
                       child: CircularProgressIndicator(
+                      backgroundColor: Colors.amber,
                       strokeWidth: 6,
                     ))
                   : FlatButton(
@@ -194,7 +195,7 @@ class _SignInScreenState extends State<SignInScreen> with SingleTickerProviderSt
 
   @override
   void didUpdateWidget(covariant SignInScreen oldWidget) {
-    print('?');
+    //print('?');
     super.didUpdateWidget(oldWidget);
   }
 }

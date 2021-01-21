@@ -1,12 +1,13 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gradeslide/gsloading.dart';
+import 'package:flutter/widgets.dart';
 import 'package:gradeslide/gssettings.dart';
 import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
 import 'package:gradeslide/pages/courses/courses_gscard.dart';
-import 'package:gradeslide/pages/courses/courses_setup_step1.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -18,20 +19,16 @@ class CoursesPage extends StatefulWidget {
 }
 
 class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStateMixin {
-  bool isEditingMode;
-  bool isSortMode;
-  List<Course> courses;
   AnimationController _controller;
-  TrackingScrollController _scrollController;
   Animation _animation;
-  Animation<Offset> _offsetAnimation;
+  bool _isEditingMode;
+  bool _isSortMode;
+  Course _selectedCourse;
 
   @override
   void initState() {
-    isEditingMode = false;
-    isSortMode = false;
-    courses = [];
-    _scrollController = TrackingScrollController();
+    _isEditingMode = false;
+    _isSortMode = false;
     _controller = AnimationController(duration: Duration(seconds: 3), vsync: this)..forward();
     _animation = new Tween<double>(begin: 0.0, end: 1.0).animate(new CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
     super.initState();
@@ -41,19 +38,11 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     DatabaseService db = Provider.of<DatabaseService>(context);
     FirebaseUser user = Provider.of<FirebaseUser>(context);
+    var isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       drawer: Drawer(elevation: 0, child: SettingsPage()),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showCourseCreation(context);
-        },
-        child: Icon(Icons.add),
-        foregroundColor: Colors.white,
-        isExtended: true,
-      ),
-      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       appBar: AppBar(
-        toolbarHeight: 55.0,
+        toolbarHeight: 45.0,
         title: Text(
           "Courses",
           style: TextStyle(color: Colors.white),
@@ -69,17 +58,22 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
         actions: [
           IconButton(
             icon: Icon(Icons.sort),
+            splashRadius: 15,
             onPressed: () {
               setState(() {
-                isSortMode = !isSortMode;
+                _isEditingMode = !_isEditingMode;
               });
             },
           ),
           IconButton(
-            icon: Icon(Icons.edit),
+            icon: Icon(
+              Icons.refresh,
+              size: 20,
+            ),
+            splashRadius: 15,
             onPressed: () {
               setState(() {
-                isEditingMode = !isEditingMode;
+                _isSortMode = !_isSortMode;
               });
             },
           ),
@@ -89,7 +83,7 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
           stream: db.streamCourses(user.uid),
           builder: (context, coursesSnapshot) {
             return FutureBuilder(
-                future: Future.delayed(Duration(milliseconds: 750)),
+                future: Future.delayed(Duration(milliseconds: 0)),
                 builder: (context, loadingScreenSnapshot) {
                   if (loadingScreenSnapshot.connectionState != ConnectionState.done) {
                     return Center(
@@ -117,25 +111,70 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
                             buildFirstCourseButton("Try Sample Course", 1, () {
                               db.addSampleChemistryCourse(user);
                               db.addSampleMathCourse(user);
+                              db.addAndrewCourse(user);
                             }),
                             buildFirstCourseButton("Manually Enter Rubric", 2, () {}),
-                            buildFirstCourseButton("Transfer Course via Course Code", 3, () {}),
+                            //buildFirstCourseButton("Import Course via Course Code", 3, () {}),
                             SizedBox(
                               height: 70,
                             )
                           ],
                         ))
-                      : !isEditingMode
-                          ? ListView(
-                              physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                              controller: _scrollController,
-                              children: coursesSnapshot.hasData
-                                  ? coursesSnapshot.data
-                                      .asMap()
-                                      .entries
-                                      .map((course) => GSCardCourse(ValueKey(course.value.documentId), course.value, isEditingMode))
-                                      .toList()
-                                  : [])
+                      : !_isEditingMode
+                          ? coursesSnapshot.data != null
+                              ? Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 5.0, left: 12.5, right: 12.5),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                                        child: Stack(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.all(8.0),
+                                                  child: Icon(
+                                                    Icons.search,
+                                                    color: Colors.white.withOpacity(.5),
+                                                  ),
+                                                ),
+                                                SizedBox(width: 5),
+                                                Text(
+                                                  "Search",
+                                                  style: TextStyle(color: Colors.white.withOpacity(.2), fontFamily: "Montserrat-Light"),
+                                                )
+                                              ],
+                                            ),
+                                            Container(
+                                              height: 40,
+                                              color: Colors.grey.withOpacity(isDark ? .05 : .2),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: GridView.builder(
+                                        padding: EdgeInsets.only(left: 10, right: 10, top: 5.0),
+                                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisSpacing: 5,
+                                          mainAxisSpacing: 5,
+                                          crossAxisCount: 2,
+                                          childAspectRatio: 1 / 1.5,
+                                        ),
+                                        itemCount: coursesSnapshot.data.length + 1,
+                                        itemBuilder: (BuildContext context, int index) {
+                                          if (index == coursesSnapshot.data.length) {
+                                            return GSCardCourse(ValueKey(""), null, false, true, true);
+                                          } else
+                                            return GSCardCourse(ValueKey(coursesSnapshot.data[index]), coursesSnapshot.data[index], false, true, false);
+                                        },
+                                      ),
+                                    )
+                                  ],
+                                )
+                              : Center(child: CircularProgressIndicator())
                           : ReorderableListView(
                               children: coursesSnapshot.hasData
                                   ? coursesSnapshot.data
@@ -190,7 +229,6 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
                 MaterialButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => CourseSetup1()));
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -203,13 +241,13 @@ class _CoursesPageState extends State<CoursesPage> with SingleTickerProviderStat
                         ),
                       ],
                     )),
-                MaterialButton(
+                /* MaterialButton(
                     onPressed: () {},
                     child: Column(
                       children: [
-                        buildCourseCreateButton(context, MdiIcons.earthArrowRight, "Transfer via Course Code"),
+                        buildCourseCreateButton(context, MdiIcons.earthArrowRight, "Import via Course Code"),
                       ],
-                    )),
+                    )),*/
               ],
             ),
           );

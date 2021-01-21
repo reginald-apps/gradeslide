@@ -5,7 +5,6 @@ import 'package:gradeslide/logic/course_data.dart';
 import 'package:gradeslide/logic/database_service.dart';
 import 'package:gradeslide/pages/courses/categories/categories_gscard_gstrack.dart';
 import 'package:gradeslide/pages/courses/categories/work/works_gscard.dart';
-import 'package:gradeslide/pages/courses/courses_gscard_gstrack.dart';
 import 'package:provider/provider.dart';
 
 class WorksPage extends StatefulWidget {
@@ -13,8 +12,11 @@ class WorksPage extends StatefulWidget {
   final Category category;
   final List<Category> categoriesInCourse;
   final int navigateToIndex;
+  final Function onPickerChanged;
+  final Work highlightWork;
+  final int workKey;
 
-  WorksPage(this.course, this.category, this.categoriesInCourse, this.navigateToIndex);
+  WorksPage(this.course, this.category, this.categoriesInCourse, this.navigateToIndex, this.onPickerChanged, this.highlightWork, this.workKey);
 
   @override
   _WorksPageState createState() => _WorksPageState();
@@ -69,152 +71,101 @@ class _WorksPageState extends State<WorksPage> with SingleTickerProviderStateMix
               db.setWorkIndex(worksInCourse[i].documentId, i);
             }
           }
-          return Scaffold(
-              appBar: AppBar(
-                toolbarHeight: 200.0,
-                title: Text(
-                  widget.course.title,
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).accentColor),
-                ),
-                actions: [
-                  IconButton(
-                    icon: Icon(Icons.sort),
-                    onPressed: () {
-                      setState(() {
-                        isSortMode = !isSortMode;
-                        _controller.reset();
-                        _controller.forward();
-                      });
-                    },
+          return widget.highlightWork == null
+              ? Scaffold(
+                  appBar: AppBar(
+                    toolbarHeight: 0,
+                    title: Padding(
+                      padding: const EdgeInsets.only(top: 5.0),
+                      child: Text(
+                        widget.category.name,
+                        style: Theme.of(context).textTheme.bodyText1,
+                        textScaleFactor: 1.25,
+                      ),
+                    ),
+                    leading: Container(),
+                    bottom: PreferredSize(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        child: GSTrackCategory(widget.category, true, (val) => {}, false),
+                      ),
+                      preferredSize: Size(0, 0),
+                    ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      setState(() {
-                        isEditingMode = !isEditingMode;
-                      });
-                    },
-                  ),
-                ],
-                bottom: PreferredSize(
-                  child: Column(
-                    children: <Widget>[
-                      GSTrackCourse(widget.course),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                  body: Container(
+                    child: isSortMode
+                        ? ReorderableListView(
+                            children: worksInCourse.map((e) {
+                              return ListTile(
+                                key: ValueKey(e.documentId),
+                                trailing: Icon(
+                                  Icons.menu,
+                                  size: 35,
+                                ),
+                                leading: Text(
+                                  "#${e.index}",
+                                  textScaleFactor: 1.50,
+                                ),
+                                tileColor: Colors.white,
+                                title: Text(
+                                  e.name,
+                                  textScaleFactor: 1.50,
+                                ),
+                              );
+                            }).toList(),
+                            onReorder: (m, n) {
+                              print("Moving Index: $m to $n");
+                              if (m > n) {
+                                //Moving Bottom to Top
+                                db.setWorkIndex(worksInCourse[m].documentId, n);
+                                db.setWorkIndex(worksInCourse[n].documentId, m);
+                              } else {
+                                //Moving Top to Bottom
+                                db.setWorkIndex(worksInCourse[m].documentId, n);
+                              }
+                            })
+                        : Column(
                             children: <Widget>[
-                              Text(
-                                worksInCourse.length.toString(),
-                                textScaleFactor: 2,
+                              Divider(
+                                height: 0,
+                                color: Colors.white.withOpacity(.65),
+                                thickness: .5,
                               ),
-                              Text(
-                                " ${widget.category.name}",
-                                textScaleFactor: 2,
+                              Expanded(
+                                child: Column(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: ListView(
+                                        controller: _trackingScrollController,
+                                        children: worksInCourse.asMap().entries.map((work) {
+                                          return GSCardWork(
+                                              id: work.key,
+                                              work: work.value,
+                                              works: worksInCourse,
+                                              categoryWeight: widget.category.weight,
+                                              isEditingMode: isEditingMode,
+                                              onPickerChanged: widget.onPickerChanged);
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: GSTrackCategory(widget.category),
-                      ),
-                    ],
-                  ),
-                  preferredSize: Size(0, 0),
-                ),
-              ),
-              body: Container(
-                child: isSortMode
-                    ? ReorderableListView(
-                        children: worksInCourse.map((e) {
-                          return ListTile(
-                            key: ValueKey(e.documentId),
-                            trailing: Icon(
-                              Icons.menu,
-                              size: 35,
-                            ),
-                            leading: Text(
-                              "#${e.index}",
-                              textScaleFactor: 1.50,
-                            ),
-                            tileColor: Colors.white,
-                            title: Text(
-                              e.name,
-                              textScaleFactor: 1.50,
-                            ),
-                          );
-                        }).toList(),
-                        onReorder: (m, n) {
-                          print("Moving Index: $m to $n");
-                          if (m > n) {
-                            //Moving Bottom to Top
-                            db.setWorkIndex(worksInCourse[m].documentId, n);
-                            db.setWorkIndex(worksInCourse[n].documentId, m);
-                          } else {
-                            //Moving Top to Bottom
-                            db.setWorkIndex(worksInCourse[m].documentId, n);
-                          }
-                        })
-                    : Column(
-                        children: <Widget>[
-                          Container(
-                            //color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[800] : Colors.white,
-                            color: isDark ? Colors.white10 : Colors.white,
-                            height: 40,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 20.0, right: 25.0, top: 5.0, bottom: 5.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      child: Text(
-                                    "Complete",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(fontWeight: FontWeight.w900, color: Colors.grey.withOpacity(.5)),
-                                  )),
-                                  Expanded(
-                                      child: Text(
-                                    "Title",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontWeight: FontWeight.w900, color: Colors.grey.withOpacity(.5)),
-                                  )),
-                                  Expanded(
-                                      child: Text(
-                                    "Score",
-                                    textAlign: TextAlign.right,
-                                    style: TextStyle(fontWeight: FontWeight.w900, color: Colors.grey.withOpacity(.5)),
-                                  )),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            height: 0,
-                            color: Colors.white.withOpacity(.65),
-                            thickness: .5,
-                          ),
-                          Expanded(
-                            child: Column(
-                              children: <Widget>[
-                                Expanded(
-                                  child: ListView(
-                                    controller: _trackingScrollController,
-                                    children: worksInCourse.asMap().entries.map((work) {
-                                      return GSCardWork(work.key, work.value, worksInCourse, widget.category.weight, isEditingMode);
-                                    }).toList(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-              ));
+                  ))
+              : ListView(
+                  controller: _trackingScrollController,
+                  physics: NeverScrollableScrollPhysics(),
+                  children: worksInCourse.sublist(widget.workKey).asMap().entries.map((work) {
+                    return GSCardWork(
+                        id: work.key,
+                        work: work.value,
+                        works: worksInCourse,
+                        categoryWeight: widget.category.weight,
+                        isEditingMode: isEditingMode,
+                        onPickerChanged: widget.onPickerChanged);
+                  }).toList());
         });
   }
 
