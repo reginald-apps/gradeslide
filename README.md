@@ -11,6 +11,3 @@
 <p>
   <img src="https://media-exp1.licdn.com/dms/image/C4E22AQEOmoUZWmh-0Q/feedshare-shrink_1280/0/1645028207904?e=1648684800&v=beta&t=CRAzu8eGur5cTMMZrR1vGuIRm66hycD5MuTdODSMyQc" width="350" title="GradeSlide Screen 3">
 </p>
-<p style="color:blue;text-align:center;">
-  
-</p>
